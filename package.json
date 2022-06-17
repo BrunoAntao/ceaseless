@@ -12,6 +12,10 @@
     "express": "^4.17.1",
     "nodemon": "^2.0.4",
     "socket.io": "^3.1.2",
-    "socket.io-p2p-server": "^1.2.0"
+    "socket.io-p2p-server": "^1.2.0",
+    "webpack": "^5.73.0"
+  },
+  "devDependencies": {
+    "webpack-cli": "^4.10.0"
   }
 }

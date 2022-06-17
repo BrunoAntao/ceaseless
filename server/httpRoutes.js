@@ -5,7 +5,7 @@ const path = require('path');
 
 module.exports = (port) => {
 
-    app.use('/', express.static(path.join(__dirname, "../")));
+    app.use('/', express.static(path.join(__dirname, "../client")));
 
     http.createServer(app).listen(port, () => {
 

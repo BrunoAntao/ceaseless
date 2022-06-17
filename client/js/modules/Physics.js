@@ -1,4 +1,4 @@
-import { Module } from "/client/js/modules/Module.js";
+import { Module } from "/js/modules/Module.js";
 
 export const Physics = {};
 

@@ -13,7 +13,7 @@ module.exports = (port) => {
 
     };
 
-    app.use('/', express.static(path.join(__dirname, "../")));
+    app.use('/', express.static(path.join(__dirname, "../client")));
 
     return https.createServer(options, app).listen(port, () => {
 

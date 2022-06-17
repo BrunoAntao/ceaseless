@@ -1,6 +1,6 @@
-import { Scene, GraphicObject } from '/client/js/modules/scene.js';
-import { AssetLoader, Sprite } from '/client/js/modules/AssetLoader.js';
-import { Vec2 } from '/client/js/modules/Vec2.js';
+import { Scene, GraphicObject } from '/js/modules/scene.js';
+import { AssetLoader, Sprite } from '/js/modules/AssetLoader.js';
+import { Vec2 } from '/js/modules/Vec2.js';
 
 document.addEventListener('DOMContentLoaded', async (event) => {
 
@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', async (event) => {
 
     const loader = scene.useModule(new AssetLoader());
 
-    loader.loadSprite('player', '/client/assets/player.png', 16, 16);
+    loader.loadSprite('player', '/assets/player.png', 16, 16);
 
     await loader.loaded();
 
