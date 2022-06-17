@@ -1,4 +1,4 @@
-function intersect(fig1, fig2) {
+export function intersect(fig1, fig2) {
   for (let i = 0; i < fig1.length; i++) {
     fig1[i].x = +((fig1[i].x).toFixed(9));
     fig1[i].y = +((fig1[i].y).toFixed(9));
@@ -21,8 +21,8 @@ function alignPolygon(polygon, points) {
   for (let i = 0; i < polygon.length; i++) {
     for (let j = 0; j < points.length; j++) {
       if (distance(polygon[i], points[j]) < 0.00000001)
-      polygon[i] = points[j];
-    }    
+        polygon[i] = points[j];
+    }
   }
   return polygon;
 }
@@ -30,7 +30,7 @@ function alignPolygon(polygon, points) {
 function distance(p1, p2) {
   var dx = Math.abs(p1.x - p2.x);
   var dy = Math.abs(p1.y - p2.y);
-  return Math.sqrt(dx*dx + dy*dy);
+  return Math.sqrt(dx * dx + dy * dy);
 }
 
 //check polygons for correctness
@@ -38,26 +38,26 @@ function checkPolygons(fig1, fig2) {
   var figs = [fig1, fig2];
   for (var i = 0; i < figs.length; i++) {
     if (figs[i].length < 3) {
-      console.error("Polygon " + (i+1) + " is invalid!");
-      return false; 
-    } 
+      console.error("Polygon " + (i + 1) + " is invalid!");
+      return false;
+    }
   }
-  return true; 
+  return true;
 }
 
 //create array of edges of all polygons
 function edgify(fig1, fig2) {
   //create primary array from all edges
   var primEdges = getEdges(fig1).concat(getEdges(fig2));
-  var secEdges = [];  
+  var secEdges = [];
   //check every edge
-  for(var i = 0; i < primEdges.length; i++) {
+  for (var i = 0; i < primEdges.length; i++) {
     var points = [];
     //for intersection with every edge except itself
-    for(var j = 0; j < primEdges.length; j++) {
+    for (var j = 0; j < primEdges.length; j++) {
       if (i != j) {
         var interPoints = findEdgeIntersection(primEdges[i], primEdges[j]);
-        addNewPoints(interPoints, points);        
+        addNewPoints(interPoints, points);
       }
     }
     //add start and end points to intersection points
@@ -72,35 +72,35 @@ function edgify(fig1, fig2) {
     for (var k = 0; k < points.length - 1; k++) {
       var edge = [
         { x: points[k].x, y: points[k].y },
-        { x: points[k+1].x, y: points[k+1].y}
+        { x: points[k + 1].x, y: points[k + 1].y }
       ];
       // check for existanse in sec.array
       if (!edgeExists(edge, secEdges)) {
         //push if not exists
         secEdges.push(edge);
-      }          
-    }    
-  }  
+      }
+    }
+  }
   return secEdges;
 }
 
 function addNewPoints(newPoints, points) {
   if (newPoints.length > 0) {
     //check for uniqueness
-    for (var k = 0; k < newPoints.length; k++) {      
-      if (!pointExists(newPoints[k], points)) {        
+    for (var k = 0; k < newPoints.length; k++) {
+      if (!pointExists(newPoints[k], points)) {
         points.push(newPoints[k]);
       }
-    }                   
-  }   
+    }
+  }
 }
 
 function sortPoints(points) {
   var p = points;
-  p.sort((a,b) => {
-        if (a.t > b.t) return 1;
-        if (a.t < b.t) return -1;
-      });
+  p.sort((a, b) => {
+    if (a.t > b.t) return 1;
+    if (a.t < b.t) return -1;
+  });
   return p;
 }
 
@@ -109,8 +109,8 @@ function getEdges(fig) {
   var len = fig.length;
   for (var i = 0; i < len; i++) {
     edges.push([
-      {x: fig[(i % len)].x, y: fig[(i % len)].y},
-      {x: fig[((i+1) % len)].x, y: fig[((i+1) % len)].y}
+      { x: fig[(i % len)].x, y: fig[(i % len)].y },
+      { x: fig[((i + 1) % len)].x, y: fig[((i + 1) % len)].y }
     ]);
   }
   return edges;
@@ -132,8 +132,8 @@ function findEdgeIntersection(edge1, edge2) {
   var t2 = nom2 / denom;
   var interPoints = [];
   //1. lines are parallel or edges don't intersect 
-  if (((denom === 0) && (nom1 !== 0)) || (t1 <= 0) || (t1 >= 1) || (t2 < 0 ) || (t2 > 1)) {
-    return interPoints;   
+  if (((denom === 0) && (nom1 !== 0)) || (t1 <= 0) || (t1 >= 1) || (t2 < 0) || (t2 > 1)) {
+    return interPoints;
   }
   //2. lines are collinear 
   else if ((nom1 === 0) && (denom === 0)) {
@@ -142,30 +142,30 @@ function findEdgeIntersection(edge1, edge2) {
       var classify = classifyPoint(edge2[i], edge1);
       //find position of this endpoints relatively to edge1
       if (classify.loc == "ORIGIN" || classify.loc == "DESTINATION") {
-        interPoints.push({x: edge2[i].x, y: edge2[i].y, t: classify.t});
+        interPoints.push({ x: edge2[i].x, y: edge2[i].y, t: classify.t });
       }
       else if (classify.loc == "BETWEEN") {
-        x = +((x1 + classify.t*(x2 - x1)).toFixed(9));
-        y = +((y1 + classify.t*(y2 - y1)).toFixed(9));
-        interPoints.push({x: x, y: y, t: classify.t});
+        x = +((x1 + classify.t * (x2 - x1)).toFixed(9));
+        y = +((y1 + classify.t * (y2 - y1)).toFixed(9));
+        interPoints.push({ x: x, y: y, t: classify.t });
       }
-    }    
-    return interPoints; 
+    }
+    return interPoints;
   }
   //3. edges intersect
   else {
     for (var i = 0; i < 2; i++) {
       var classify = classifyPoint(edge2[i], edge1);
       if (classify.loc == "ORIGIN" || classify.loc == "DESTINATION") {
-        interPoints.push({x: edge2[i].x, y: edge2[i].y, t: classify.t});
+        interPoints.push({ x: edge2[i].x, y: edge2[i].y, t: classify.t });
       }
     }
     if (interPoints.length > 0) {
-      return interPoints;  
+      return interPoints;
     }
-    var x = +((x1 + t1*(x2 - x1)).toFixed(9));
-    var y = +((y1 + t1*(y2 - y1)).toFixed(9));
-    interPoints.push({x: x, y: y, t: t1});
+    var x = +((x1 + t1 * (x2 - x1)).toFixed(9));
+    var y = +((y1 + t1 * (y2 - y1)).toFixed(9));
+    interPoints.push({ x: x, y: y, t: t1 });
     return interPoints;
   }
 }
@@ -177,35 +177,35 @@ function classifyPoint(p, edge) {
   var by = p.y - edge[0].y;
   var sa = ax * by - bx * ay;
   if ((p.x === edge[0].x) && (p.y === edge[0].y)) {
-    return {loc: "ORIGIN", t: 0};
+    return { loc: "ORIGIN", t: 0 };
   }
   if ((p.x === edge[1].x) && (p.y === edge[1].y)) {
-    return {loc: "DESTINATION", t: 1};
+    return { loc: "DESTINATION", t: 1 };
   }
-  var theta = (polarAngle([edge[1], edge[0]]) - 
-    polarAngle([{x: edge[1].x, y: edge[1].y}, {x: p.x, y: p.y}])) % 360;
+  var theta = (polarAngle([edge[1], edge[0]]) -
+    polarAngle([{ x: edge[1].x, y: edge[1].y }, { x: p.x, y: p.y }])) % 360;
   if (theta < 0) {
     theta = theta + 360;
-  } 
-  if (sa < -0.000000001) {    
-    return {loc: "LEFT", theta: theta};
   }
-  if (sa > 0.000000001) {    
-    return {loc: "RIGHT", theta: theta};
+  if (sa < -0.000000001) {
+    return { loc: "LEFT", theta: theta };
+  }
+  if (sa > 0.000000001) {
+    return { loc: "RIGHT", theta: theta };
   }
   if (((ax * bx) < 0) || ((ay * by) < 0)) {
-    return {loc: "BEHIND", theta: theta};
+    return { loc: "BEHIND", theta: theta };
   }
   if ((Math.sqrt(ax * ax + ay * ay)) < (Math.sqrt(bx * bx + by * by))) {
-    return {loc: "BEYOND", theta: theta};
+    return { loc: "BEYOND", theta: theta };
   }
   var t;
   if (ax !== 0) {
-    t = bx/ax;
+    t = bx / ax;
   } else {
-    t = by/ay;
+    t = by / ay;
   }
-  return {loc: "BETWEEN", t: t};
+  return { loc: "BETWEEN", t: t };
 }
 
 function polarAngle(edge) {
@@ -221,14 +221,14 @@ function polarAngle(edge) {
   if (dy === 0) {
     return ((dx > 0) ? 0 : 180);
   }
-  var theta = Math.atan(dy/dx)*360/(2*Math.PI);
+  var theta = Math.atan(dy / dx) * 360 / (2 * Math.PI);
   if (dx > 0) {
     return ((dy >= 0) ? theta : theta + 360);
   } else {
     return (theta + 180);
   }
 }
- 
+
 function pointExists(p, points) {
   if (points.length === 0) {
     return false;
@@ -249,14 +249,14 @@ function edgeExists(e, edges) {
     if (equalEdges(e, edges[i]))
       return true;
   }
-  return false;  
+  return false;
 }
 
 function equalEdges(edge1, edge2) {
   if (((edge1[0].x === edge2[0].x) &&
-      (edge1[0].y === edge2[0].y) &&
-      (edge1[1].x === edge2[1].x) &&
-      (edge1[1].y === edge2[1].y)) || (
+    (edge1[0].y === edge2[0].y) &&
+    (edge1[1].x === edge2[1].x) &&
+    (edge1[1].y === edge2[1].y)) || (
       (edge1[0].x === edge2[1].x) &&
       (edge1[0].y === edge2[1].y) &&
       (edge1[1].x === edge2[0].x) &&
@@ -266,7 +266,7 @@ function equalEdges(edge1, edge2) {
     return false;
   }
 }
- 
+
 function polygonate(edges) {
   var polygons = [];
   var polygon = [];
@@ -274,8 +274,8 @@ function polygonate(edges) {
   var midpoints = getMidpoints(edges);
   //start from every edge and create non-selfintersecting polygons
   for (var i = 0; i < len - 2; i++) {
-    var org = {x: edges[i][0].x, y: edges[i][0].y};    
-    var dest = {x: edges[i][1].x, y: edges[i][1].y};
+    var org = { x: edges[i][0].x, y: edges[i][0].y };
+    var dest = { x: edges[i][1].x, y: edges[i][1].y };
     var currentEdge = i;
     var point;
     var p;
@@ -286,8 +286,8 @@ function polygonate(edges) {
       polygon = [];
       stop = false;
       while ((polygon.length === 0) || (!stop)) {
-      //add point to polygon
-        polygon.push({x: org.x, y: org.y});
+        //add point to polygon
+        polygon.push({ x: org.x, y: org.y });
         point = undefined;
         //look for edge connected with end of current edge
         for (var j = 0; j < len; j++) {
@@ -305,10 +305,10 @@ function polygonate(edges) {
             if (p) {
               var classify = classifyPoint(p, [org, dest]);
               //if this edge has smaller theta then last found edge update data of next edge of polygon
-              if (!point || 
-                  ((classify.theta < point.theta) && (direction === 0)) ||
-                  ((classify.theta > point.theta) && (direction === 1))) {
-                point = {x: p.x, y: p.y, theta: classify.theta, edge: j};
+              if (!point ||
+                ((classify.theta < point.theta) && (direction === 0)) ||
+                ((classify.theta > point.theta) && (direction === 1))) {
+                point = { x: p.x, y: p.y, theta: classify.theta, edge: j };
               }
             }
           }
@@ -335,13 +335,13 @@ function polygonate(edges) {
               polygon = false;
             }
           }
-        }   
+        }
       }
       //add created polygon if it is correct and was not found before
       if (polygon && !polygonExists(polygon, polygons)) {
         polygons.push(polygon);
       }
-    }    
+    }
   }
   //console.log("polygonate: " + JSON.stringify(polygons));
   return polygons;
@@ -364,7 +364,7 @@ function polygonExists(polygon, polygons) {
         else {
           //and it is last point in polygon we found polygon in array!
           if (j === polygon.length - 1) return true;
-        }        
+        }
       }
     }
   }
@@ -376,15 +376,15 @@ function filterPolygons(polygons, fig1, fig2, mode) {
   var c1, c2;
   var point;
   var bigPolygons = removeSmallPolygons(polygons, 0.0001);
-  for(var i = 0; i < bigPolygons.length; i++) {
+  for (var i = 0; i < bigPolygons.length; i++) {
     point = getPointInsidePolygon(bigPolygons[i]);
     c1 = findPointInsidePolygon(point, fig1);
     c2 = findPointInsidePolygon(point, fig2);
     if (
-        ((mode === "intersect") && c1 && c2) || //intersection
-        ((mode === "cut1") && c1 && !c2) ||     //fig1 - fig2
-        ((mode === "cut2") && !c1 && c2) ||     //fig2 - fig2
-        ((mode === "sum") && (c1 || c2))) {     //fig1 + fig2      
+      ((mode === "intersect") && c1 && c2) || //intersection
+      ((mode === "cut1") && c1 && !c2) ||     //fig1 - fig2
+      ((mode === "cut2") && !c1 && c2) ||     //fig2 - fig2
+      ((mode === "sum") && (c1 || c2))) {     //fig1 + fig2      
       filtered.push(bigPolygons[i]);
     }
   }
@@ -406,10 +406,10 @@ function polygonArea(p) {
   var len = p.length;
   var s = 0;
   for (var i = 0; i < len; i++) {
-     s += Math.abs((p[i % len].x * p[(i + 1) % len].y) - (p[i % len].y * 
+    s += Math.abs((p[i % len].x * p[(i + 1) % len].y) - (p[i % len].y *
       p[(i + 1) % len].x));
   }
-  return s/2;
+  return s / 2;
 }
 
 function getPointInsidePolygon(polygon) {
@@ -423,22 +423,22 @@ function getPointInsidePolygon(polygon) {
   var interPoints = [];
   var pointsOK = false;
   while (!pointsOK) {
-    line = [{x: (size.x.min - 1), y: y},{x: (size.x.max + 1), y: y}];
+    line = [{ x: (size.x.min - 1), y: y }, { x: (size.x.max + 1), y: y }];
     //find intersections with all polygon edges
     for (var i = 0; i < edges.length; i++) {
       points = findEdgeIntersection(line, edges[i]);
       //if edge doesn't lie inside line
       if (points && (points.length === 1)) {
-         interPoints.push(points[0]);      
+        interPoints.push(points[0]);
       }
     }
     interPoints = sortPoints(interPoints);
     //find two correct interpoints
     for (var i = 0; i < interPoints.length - 1; i++) {
-      if (interPoints[i].t !== interPoints[i+1].t) {
+      if (interPoints[i].t !== interPoints[i + 1].t) {
         //enable exit from loop and calculate point coordinates
         pointsOK = true;
-        point = {x: ((interPoints[i].x + interPoints[i+1].x) / 2), y: y};
+        point = { x: ((interPoints[i].x + interPoints[i + 1].x) / 2), y: y };
       }
     }
     //all points are incorrect, need to change line parameters
@@ -479,18 +479,18 @@ function findPointInsidePolygon(point, polygon) {
   for (var i = 0; i < edges.length; i++) {
     [org, dest] = edges[i];
     classify = classifyPoint(point, [org, dest]);
-    if (  (
-            (classify.loc === "RIGHT") &&
-            (org.y < point.y) &&
-            (dest.y >= point.y)
-          ) ||
-          (
-            (classify.loc === "LEFT") &&
-            (org.y >= point.y) &&
-            (dest.y < point.y)
-          )
-        ) {
-      cross++;    
+    if ((
+      (classify.loc === "RIGHT") &&
+      (org.y < point.y) &&
+      (dest.y >= point.y)
+    ) ||
+      (
+        (classify.loc === "LEFT") &&
+        (org.y >= point.y) &&
+        (dest.y < point.y)
+      )
+    ) {
+      cross++;
     }
     if (classify.loc === "BETWEEN") return false;
   }
@@ -507,15 +507,15 @@ function getMidpoints(edges) {
   for (var i = 0; i < edges.length; i++) {
     x = (edges[i][0].x + edges[i][1].x) / 2;
     y = (edges[i][0].y + edges[i][1].y) / 2;
-    classify = classifyPoint({x: x, y:y}, edges[i]);
+    classify = classifyPoint({ x: x, y: y }, edges[i]);
     if (classify.loc != "BETWEEN") {
       console.error("Midpoint calculation error");
     }
-    midpoints.push({x: x, y: y}); 
+    midpoints.push({ x: x, y: y });
   }
   return midpoints;
 }
-  
+
 function log(obj) {
   console.log(JSON.stringify(obj));
 }
