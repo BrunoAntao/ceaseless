@@ -45,7 +45,10 @@ class Scene {
 
     useModule(module) {
 
-        module(this);
+        this.Modules[module.name] = module;
+        module.register();
+
+        return this.Modules[module.name];
 
     }
 
@@ -291,119 +294,27 @@ class GraphicObject {
 
 class Sprite extends GraphicObject {
 
-    constructor(scene, position = new Vec2()) {
+    constructor(scene, key, position = new Vec2()) {
 
         super(scene, position);
 
+        this.key = key;
+        this.asset = scene.Modules.AssetLoader.getAsset(key);
+
         this.anchor = new Vec2(0.5, 0.5);
 
-        this.image = new Image();
-        this.image.src = "assets/player.png";
-
-        this.width = this.image.width;
-        this.height = this.image.height;
+        this.width = this.asset.image.width;
+        this.height = this.asset.image.height;
 
     }
 
     render() {
 
         this.scene.ctx.drawImage(
-            this.image,
+            this.asset.image,
             this.position.x - (this.anchor.x * this.width),
             this.position.y - (this.anchor.y * this.height)
         );
-
-    }
-
-}
-
-class InputHandler {
-
-    constructor() {
-
-        this.keys = {}
-
-        this.mouse = {
-
-            x: 0,
-            y: 0,
-
-            left: false,
-            middle: false,
-            right: false
-
-        };
-
-        document.body.addEventListener("contextmenu", e => {
-
-            e.preventDefault();
-
-        })
-
-        document.body.addEventListener("mousedown", e => {
-
-            if (e.button === 0) {
-
-                this.mouse.left = true;
-
-            } else if (e.button === 1) {
-
-                this.mouse.middle = true;
-
-            } else if (e.button === 2) {
-
-                this.mouse.right = true;
-
-            }
-
-        })
-
-        document.body.addEventListener("mouseup", e => {
-
-            if (e.button === 0) {
-
-                this.mouse.left = false;
-
-            } else if (e.button === 1) {
-
-                this.mouse.middle = false;
-
-            } else if (e.button === 2) {
-
-                this.mouse.right = false;
-
-            }
-
-        })
-
-        document.body.addEventListener("mousemove", e => {
-
-            this.mouse.x = e.clientX;
-            this.mouse.y = e.clientY;
-
-        })
-
-        document.body.addEventListener("keydown", e => {
-
-            this.keys[e.key] = true;
-
-        })
-
-        document.body.addEventListener("keyup", e => {
-
-            this.keys[e.key] = false;
-
-        })
-
-    }
-
-    module() {
-
-        return (scene) => {
-
-            scene.Modules[this.constructor.name] = new this.constructor();
-
-        }
 
     }
 
@@ -612,11 +523,11 @@ Graphics.DrawPath = (scene, body) => {
 
 class Entity extends Sprite {
 
-    constructor(scene, position = new Vec2()) {
+    constructor(scene, key, position = new Vec2()) {
 
-        super(scene, position)
+        super(scene, key, position)
 
-        this.body = new Physics.Body.Square(this.image.width);
+        this.body = new Physics.Body.Square(this.asset.image.width);
         this.body.parent = scene;
         this.body.moveTo(this);
 
@@ -649,7 +560,7 @@ class Player extends Entity {
 
     constructor(scene, position = new Vec2()) {
 
-        super(scene, position)
+        super(scene, 'player', position)
 
         this.fireRate = 100;
         this.lastFire = 0;
@@ -694,14 +605,14 @@ class Player extends Entity {
 
             }
 
-            if (this.scene.Modules.InputHandler.mouse.left) {
+            //     if (this.scene.Modules.InputHandler.mouse.left) {
 
-                if (Date.now() - this.lastFire > this.fireRate) {
-                    let projectile = new Projectile(this.scene, this.position.clone(), this.position.angleBetween(new Vec2(this.scene.Modules.InputHandler.mouse.x, this.scene.Modules.InputHandler.mouse.y)));
-                    this.bulletsPhysicsGroup.add(projectile.getBody());
-                    this.lastFire = Date.now();
-                }
-            }
+            //         if (Date.now() - this.lastFire > this.fireRate) {
+            //             let projectile = new Projectile(this.scene, this.position.clone(), this.position.angleBetween(new Vec2(this.scene.Modules.InputHandler.mouse.x, this.scene.Modules.InputHandler.mouse.y)));
+            //             this.bulletsPhysicsGroup.add(projectile.getBody());
+            //             this.lastFire = Date.now();
+            //         }
+            //     }
 
         }
 
