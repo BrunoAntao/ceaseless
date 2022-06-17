@@ -1,34 +1,28 @@
 import { Scene, GraphicObject } from '/js/modules/scene.js';
 import { AssetLoader, Sprite } from '/js/modules/AssetLoader.js';
+import { InputHandler } from '/js/modules/InputHandler.js';
+import { Physics, Entity } from '/js/modules/Physics.js';
+import { Player } from '/js/modules/Game.js';
 import { Vec2 } from '/js/modules/Vec2.js';
 
 document.addEventListener('DOMContentLoaded', async (event) => {
 
     let scene = new Scene({
 
-        backgroundColor: "rgba(33, 33, 33, 1)",
-
-        // drawBodies: true
+        backgroundColor: "rgba(33, 33, 33, 1)"
 
     });
 
-    const loader = scene.useModule(new AssetLoader());
+    const Loader = scene.useModule(new AssetLoader());
+    scene.useModule(new InputHandler());
+    const PhysicsManager = scene.useModule(new Physics({ drawBodies: true }));
 
-    loader.loadSprite('player', 'assets/player.png', 16, 16);
+    Loader.loadSprite('player', 'assets/player.png', 16, 16);
 
-    await loader.loaded();
+    await Loader.loaded();
 
-    let sp = new Sprite(scene, 'player', new Vec2(0, 0));
-
-    // const { InputHandler } = await import('/js/modules/InputHandler.js');
-    // const { AssetLoader } = await import('/js/modules/AssetLoader.js');
-    // const { Physics } = await import('/js/modules/Physics.js');
-
-    // scene.useModule(new InputHandler());
-    // scene.useModule(new Physics.Module());
-
-    // let player = new Player(scene, new Vec2(64, 64));
-    // let enemy = new Entity(scene, new Vec2(128, 64));
+    let player = new Player(scene, new Vec2(64, 64));
+    let enemy = new Entity(scene, 'player', new Vec2(128, 64));
 
     // Physics.Detector(scene, [player.bulletsPhysicsGroup, enemy], () => {
 
@@ -36,42 +30,13 @@ document.addEventListener('DOMContentLoaded', async (event) => {
 
     // })
 
-    // Physics.Detector(scene, [player, enemy], () => {
+    PhysicsManager.Detector([player, enemy], () => {
 
-    //     enemy.remove();
+        enemy.remove();
 
-    // })
-
-    let direction = { x: 1, y: 1 };
+    })
 
     scene.update = () => {
-
-        if (sp.position.x > scene.canvas.width - sp.width) {
-
-            direction.x = -1;
-
-        }
-
-        if (sp.position.y > scene.canvas.height - sp.height) {
-
-            direction.y = -1;
-
-        }
-
-        if (sp.position.x < 0) {
-
-            direction.x = 1;
-
-        }
-
-        if (sp.position.y < 0) {
-
-            direction.y = 1;
-
-        }
-
-        sp.position.x += direction.x;
-        sp.position.y += direction.y;
 
     }
 

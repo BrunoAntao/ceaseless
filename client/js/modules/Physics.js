@@ -1,12 +1,107 @@
 import { Module } from "/js/modules/Module.js";
+import { Sprite } from "/js/modules/AssetLoader.js";
+import { Vec2 } from "/js/modules/Vec2.js";
+import { Intersect } from "/js/modules/Intersect.js";
+import { Graphics } from "/js/modules/Scene.js"
 
-export const Physics = {};
+export class Physics extends Module {
 
-Physics.Module = class extends Module {
+    constructor(options) {
 
-    constructor() {
+        super('Physics', options);
 
-        super('Physics');
+        this.bodies = [];
+
+    }
+
+    update() {
+
+        for (let i = 0; i < this.bodies.length; i++) {
+
+            const a = this.bodies[i];
+
+            for (let j = i + 1; j < this.bodies.length; j++) {
+
+                const b = this.bodies[j];
+
+                const collision = a.collides[b.uuid];
+
+                if (collision) {
+
+                    if (a instanceof Physics.Group) {
+
+                        if (b instanceof Physics.Group) {
+
+                            for (const A of a.bodies) {
+
+                                for (const B of b.bodies) {
+
+                                    Physics.collisionUpdate(A, B, collision);
+
+                                }
+
+                            }
+
+                        } else {
+
+                            for (const A of a.bodies) {
+
+                                Physics.collisionUpdate(A, b, collision);
+
+                            }
+
+                        }
+
+                    } else {
+
+                        Physics.collisionUpdate(a, b, collision);
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
+    render() {
+
+        if (this.options.drawBodies) {
+
+            for (const body of this.bodies) {
+
+                if (body instanceof Physics.Group) {
+
+                    for (const a of body.bodies) {
+
+                        Graphics.DrawPath(this.scene, a);
+
+                    }
+
+                } else {
+
+                    Graphics.DrawPath(this.scene, body);
+
+                }
+
+            }
+
+        }
+
+    }
+
+    Detector([a, b], cb) {
+
+        let A = (a instanceof Physics.Group && a) || a.getBody();
+        let B = (b instanceof Physics.Group && b) || b.getBody();
+
+        this.bodies.indexOf(A) == -1 && this.bodies.push(A);
+        this.bodies.indexOf(B) == -1 && this.bodies.push(B);
+
+        A.collides[B.uuid] = { body: B, cb };
+        B.collides[A.uuid] = { body: A, cb };
 
     }
 
@@ -15,8 +110,6 @@ Physics.Module = class extends Module {
 Physics.Body = class {
 
     constructor(vecs = []) {
-
-        this.uuid = uuidv4();
 
         this.rvecs = vecs;
         this.vecs = vecs;
@@ -124,13 +217,13 @@ Physics.Body.Square = class extends Physics.Body {
 
 Physics.collides = (a, b) => {
 
-    return intersect(a.vecs, b.vecs);
+    return Intersect(a.vecs, b.vecs);
 
 }
 
 Physics.AABBcollides = (a, b) => {
 
-    return intersect(a.AABB(), b.AABB());
+    return Intersect(a.AABB(), b.AABB());
 
 }
 
@@ -152,24 +245,10 @@ Physics.collisionUpdate = (a, b, collision) => {
 
 }
 
-Physics.Detector = (scene, [a, b], cb) => {
-
-    let A = (a instanceof Physics.Group && a) || a.getBody();
-    let B = (b instanceof Physics.Group && b) || b.getBody();
-
-    scene.bodies.indexOf(A) == -1 && scene.bodies.push(A);
-    scene.bodies.indexOf(B) == -1 && scene.bodies.push(B);
-
-    A.collides[B.uuid] = { body: B, cb };
-    B.collides[A.uuid] = { body: A, cb };
-
-}
-
 Physics.Group = class {
 
     constructor() {
 
-        this.uuid = uuidv4();
         this.collides = {};
 
         this.bodies = [];
@@ -180,6 +259,41 @@ Physics.Group = class {
 
         body.parent = this;
         this.bodies.push(body);
+
+    }
+
+}
+
+export class Entity extends Sprite {
+
+    constructor(scene, key, position = new Vec2()) {
+
+        super(scene, key, position)
+
+        this.body = new Physics.Body.Square(this.asset.image.width);
+        this.body.parent = scene.Modules.Physics;
+        this.body.moveTo(this);
+
+    }
+
+    remove() {
+
+        this.body.remove();
+        super.remove();
+
+    }
+
+    getBody() {
+
+        return this.body;
+
+    }
+
+    collides() { }
+
+    update() {
+
+        this.body.moveTo(this);
 
     }
 

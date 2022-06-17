@@ -19,8 +19,6 @@ export class Scene {
 
             container: document.body,
 
-            drawBodies: false
-
         }, options);
 
         this.canvas = document.createElement('canvas');
@@ -30,7 +28,6 @@ export class Scene {
         this.options.container.append(this.canvas);
 
         this.objects = [];
-        this.bodies = [];
 
         this.Modules = {};
 
@@ -48,7 +45,7 @@ export class Scene {
     useModule(module) {
 
         this.Modules[module.name] = module;
-        module.register();
+        module.register(this);
 
         return this.Modules[module.name];
 
@@ -80,60 +77,6 @@ export class Scene {
 
     update() { }
 
-    physicsUpdate() {
-
-        this.update();
-
-        for (let i = 0; i < this.bodies.length; i++) {
-
-            const a = this.bodies[i];
-
-            for (let j = i + 1; j < this.bodies.length; j++) {
-
-                const b = this.bodies[j];
-
-                const collision = a.collides[b.uuid];
-
-                if (collision) {
-
-                    if (a instanceof Physics.Group) {
-
-                        if (b instanceof Physics.Group) {
-
-                            for (const A of a.bodies) {
-
-                                for (const B of b.bodies) {
-
-                                    Physics.collisionUpdate(A, B, collision);
-
-                                }
-
-                            }
-
-                        } else {
-
-                            for (const A of a.bodies) {
-
-                                Physics.collisionUpdate(A, b, collision);
-
-                            }
-
-                        }
-
-                    } else {
-
-                        Physics.collisionUpdate(a, b, collision);
-
-                    }
-
-                }
-
-            }
-
-        }
-
-    }
-
     render() {
 
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -145,7 +88,15 @@ export class Scene {
 
         this.ctx.fillText(this.fps, 8, 8 + this.textMetrics.actualBoundingBoxAscent);
 
-        this.physicsUpdate();
+        this.update();
+
+        const Modules = Object.values(this.Modules);
+
+        for (const Module of Modules) {
+
+            Module.update && Module.update();
+
+        }
 
         for (const object of this.objects) {
 
@@ -154,25 +105,9 @@ export class Scene {
 
         }
 
-        if (this.options.drawBodies) {
+        for (const Module of Modules) {
 
-            for (const body of this.bodies) {
-
-                if (body instanceof Physics.Group) {
-
-                    for (const a of body.bodies) {
-
-                        Graphics.DrawPath(this, a);
-
-                    }
-
-                } else {
-
-                    Graphics.DrawPath(this, body);
-
-                }
-
-            }
+            Module.render && Module.render();
 
         }
 
@@ -204,7 +139,7 @@ export class GraphicObject {
 
 }
 
-const Graphics = {};
+export const Graphics = {};
 
 Graphics.DrawPath = (scene, body) => {
 
@@ -229,107 +164,6 @@ Graphics.DrawPath = (scene, body) => {
     scene.ctx.stroke();
 
 }
-
-// class Entity extends Sprite {
-
-//     constructor(scene, key, position = new Vec2()) {
-
-//         super(scene, key, position)
-
-//         this.body = new Physics.Body.Square(this.asset.image.width);
-//         this.body.parent = scene;
-//         this.body.moveTo(this);
-
-//     }
-
-//     remove() {
-
-//         this.body.remove();
-//         super.remove();
-
-//     }
-
-//     getBody() {
-
-//         return this.body;
-
-//     }
-
-//     collides() { }
-
-//     update() {
-
-//         this.body.moveTo(this);
-
-//     }
-
-// }
-
-// class Player extends Entity {
-
-//     constructor(scene, position = new Vec2()) {
-
-//         super(scene, 'player', position)
-
-//         this.anchor = new Vec2(0.5, 0.5);
-
-//         this.fireRate = 100;
-//         this.lastFire = 0;
-
-//         this.bulletsPhysicsGroup = new Physics.Group();
-
-//     }
-
-//     move(vec = new Vec2()) {
-
-//         this.position = Vec2.sum(this.position, vec);
-
-//     }
-
-//     update() {
-
-//         super.update();
-
-//         if (this.scene.Modules.InputHandler) {
-
-//             if (this.scene.Modules.InputHandler.keys["w"]) {
-
-//                 this.move(new Vec2(0, -1));
-
-//             }
-
-//             if (this.scene.Modules.InputHandler.keys["s"]) {
-
-//                 this.move(new Vec2(0, 1));
-
-//             }
-
-//             if (this.scene.Modules.InputHandler.keys["a"]) {
-
-//                 this.move(new Vec2(-1, 0));
-
-//             }
-
-//             if (this.scene.Modules.InputHandler.keys["d"]) {
-
-//                 this.move(new Vec2(1, 0));
-
-//             }
-
-//             //     if (this.scene.Modules.InputHandler.mouse.left) {
-
-//             //         if (Date.now() - this.lastFire > this.fireRate) {
-//             //             let projectile = new Projectile(this.scene, this.position.clone(), this.position.angleBetween(new Vec2(this.scene.Modules.InputHandler.mouse.x, this.scene.Modules.InputHandler.mouse.y)));
-//             //             this.bulletsPhysicsGroup.add(projectile.getBody());
-//             //             this.lastFire = Date.now();
-//             //         }
-//             //     }
-
-//         }
-
-//     }
-
-// }
 
 // class Projectile extends Entity {
 

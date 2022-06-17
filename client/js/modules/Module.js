@@ -1,12 +1,15 @@
 export class Module {
 
-    constructor(name) {
+    constructor(name, options = {}) {
 
         this.name = name;
+        this.options = options;
 
     }
 
-    register() {
+    register(scene) {
+
+        this.scene = scene;
 
         console.log(`Module ${this.name} loaded.`);
 
