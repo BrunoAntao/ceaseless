@@ -13,19 +13,7 @@ module.exports = (port) => {
 
     };
 
-    app.use('/', express.static(path.join(__dirname, "../client")));
-
-    app.get('/broadcast/*', (req, res) => {
-
-        res.sendFile(path.join(__dirname, '../client/broadcast.html'));
-
-    })
-
-    app.get('/watch/*', (req, res) => {
-
-        res.sendFile(path.join(__dirname, '../client/watch.html'));
-
-    })
+    app.use('/', express.static(path.join(__dirname, "../")));
 
     return https.createServer(options, app).listen(port, () => {
 
