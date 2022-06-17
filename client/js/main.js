@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', async (event) => {
 
     const loader = scene.useModule(new AssetLoader());
 
-    loader.loadSprite('player', '/assets/player.png', 16, 16);
+    loader.loadSprite('player', 'assets/player.png', 16, 16);
 
     await loader.loaded();
 
