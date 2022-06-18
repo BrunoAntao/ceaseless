@@ -70,13 +70,29 @@ export class InputHandler extends Module {
 
         document.body.addEventListener("keydown", e => {
 
-            this.keys[e.key] = true;
+            if (!e.getModifierState('CapsLock')) {
+
+                this.keys[e.key] = true;
+
+            } else {
+
+                this.keys[e.key.toLowerCase()] = true;
+
+            }
 
         })
 
         document.body.addEventListener("keyup", e => {
 
-            this.keys[e.key] = false;
+            if (!e.getModifierState('CapsLock')) {
+
+                this.keys[e.key] = false;
+
+            } else {
+
+                this.keys[e.key.toLowerCase()] = false;
+
+            }
 
         })
 
