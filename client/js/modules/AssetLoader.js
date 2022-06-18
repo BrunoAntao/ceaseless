@@ -69,6 +69,8 @@ export class Sprite extends GraphicObject {
 
     }
 
+    update() { }
+
     render() {
 
         this.scene.ctx.drawImage(

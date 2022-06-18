@@ -7,6 +7,9 @@ export class Module {
 
     }
 
+    update() { }
+    render() { }
+
     register(scene) {
 
         this.scene = scene;

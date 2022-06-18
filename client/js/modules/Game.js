@@ -18,7 +18,8 @@ export class Player extends Entity {
 
     move(vec = new Vec2()) {
 
-        this.position = Vec2.sum(this.position, vec);
+        let body = this.getBody();
+        body.velocity = Vec2.sum(body.velocity, vec);
 
     }
 

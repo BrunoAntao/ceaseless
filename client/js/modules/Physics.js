@@ -2,9 +2,17 @@ import { Module } from "/js/modules/Module.js";
 import { Sprite } from "/js/modules/AssetLoader.js";
 import { Vec2 } from "/js/modules/Vec2.js";
 import { Intersect } from "/js/modules/Intersect.js";
-import { Graphics } from "/js/modules/Scene.js"
+import { Graphics } from "/js/modules/Scene.js";
 
-export class Physics extends Module {
+function uuidv4() {
+    return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    );
+}
+
+export const Physics = {};
+
+export class PhysicsModule extends Module {
 
     constructor(options) {
 
@@ -111,10 +119,23 @@ Physics.Body = class {
 
     constructor(vecs = []) {
 
+        this.uuid = uuidv4();
+
         this.rvecs = vecs;
         this.vecs = vecs;
 
+        this.velocity = new Vec2();
+
         this.collides = {};
+
+    }
+
+    update() {
+
+        this.velocity.x *= 0.8;
+        this.velocity.y *= 0.8;
+
+        this.moveTo(Vec2.sum(this.AABB()[0], this.velocity));
 
     }
 
@@ -272,7 +293,7 @@ export class Entity extends Sprite {
 
         this.body = new Physics.Body.Square(this.asset.image.width);
         this.body.parent = scene.Modules.Physics;
-        this.body.moveTo(this);
+        this.body.moveTo(position);
 
     }
 
@@ -293,7 +314,12 @@ export class Entity extends Sprite {
 
     update() {
 
-        this.body.moveTo(this);
+        this.body.update();
+
+        let pos = this.body.AABB()[0];
+
+        this.position.x = pos.x + this.anchor.x * this.width;
+        this.position.y = pos.y + this.anchor.y * this.height;
 
     }
 
