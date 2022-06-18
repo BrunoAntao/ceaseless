@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await Loader.loaded();
 
     let player = new Player(scene, new Vec2(64, 64));
-    let enemy = new Entity(scene, 'player', new Vec2(128, 64));
+    // let enemy = new Entity(scene, 'player', new Vec2(128, 64));
 
     let tilemap = new TileMap();
 
@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         let vec = new Vec2();
-        vec[intersect.key] = intersect.value * direction[intersect.key] * 2;
+        vec[intersect.key] = intersect.value * direction[intersect.key];
 
         p.moveTo(Vec2.sum(
             p.AABB()[0],
@@ -78,11 +78,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // })
 
-    PhysicsManager.Detector([player, enemy], () => {
+    // PhysicsManager.Detector([player, enemy], () => {
 
-        enemy.remove();
+    //     enemy.remove();
 
-    })
+    // })
 
     scene.update = () => {
 
