@@ -20,6 +20,8 @@ export class PhysicsModule extends Module {
 
         this.bodies = [];
 
+        this.friction = 0.8;
+
     }
 
     update() {
@@ -132,8 +134,20 @@ Physics.Body = class {
 
     update() {
 
-        this.velocity.x *= 0.8;
-        this.velocity.y *= 0.8;
+        this.velocity.x *= this.manager.friction;
+        this.velocity.y *= this.manager.friction;
+
+        if (Math.abs(this.velocity.x) < 0.1) {
+
+            this.velocity.x = 0;
+
+        }
+
+        if (Math.abs(this.velocity.y) < 0.1) {
+
+            this.velocity.y = 0;
+
+        }
 
         this.moveTo(Vec2.sum(this.AABB()[0], this.velocity));
 
@@ -168,6 +182,56 @@ Physics.Body = class {
         }
 
         this.vecs = nvecs;
+
+    }
+
+    getOffset() {
+
+        let xMin = Infinity;
+        let yMin = Infinity;
+        let xMax = -Infinity;
+        let yMax = -Infinity;
+
+        for (const vec of this.vecs) {
+
+            if (vec.x < xMin) {
+
+                xMin = vec.x;
+
+            }
+
+            if (vec.y < yMin) {
+
+                yMin = vec.y;
+
+            }
+
+            if (vec.x > xMax) {
+
+                xMax = vec.x;
+
+            }
+
+            if (vec.y > yMax) {
+
+                yMax = vec.y;
+
+            }
+
+        }
+
+        const xDelta = xMax - xMin;
+        const yDelta = yMax - yMin;
+
+        if (xDelta < yDelta) {
+
+            return { key: 'x', value: xDelta };
+
+        } else {
+
+            return { key: 'y', value: yDelta };
+
+        }
 
     }
 
@@ -254,11 +318,13 @@ Physics.collisionUpdate = (a, b, collision) => {
 
         // console.log('AABB collides');
 
-        if (Physics.collides(a, b).length > 0) {
+        let col = Physics.collides(a, b);
+
+        if (col.length > 0) {
 
             // console.log('collides');
 
-            collision.cb();
+            collision.cb(col, a, b);
 
         }
 
@@ -292,6 +358,7 @@ export class Entity extends Sprite {
         super(scene, key, position)
 
         this.body = new Physics.Body.Square(this.asset.image.width);
+        this.body.manager = scene.Modules.Physics;
         this.body.parent = scene.Modules.Physics;
         this.body.moveTo(position);
 

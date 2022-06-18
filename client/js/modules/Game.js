@@ -12,6 +12,8 @@ export class Player extends Entity {
         this.fireRate = 100;
         this.lastFire = 0;
 
+        this.velocity = 0.6;
+
         this.bulletsPhysicsGroup = new Physics.Group();
 
     }
@@ -31,25 +33,25 @@ export class Player extends Entity {
 
             if (this.scene.Modules.InputHandler.keys["w"]) {
 
-                this.move(new Vec2(0, -1));
+                this.move(new Vec2(0, -this.velocity));
 
             }
 
             if (this.scene.Modules.InputHandler.keys["s"]) {
 
-                this.move(new Vec2(0, 1));
+                this.move(new Vec2(0, this.velocity));
 
             }
 
             if (this.scene.Modules.InputHandler.keys["a"]) {
 
-                this.move(new Vec2(-1, 0));
+                this.move(new Vec2(-this.velocity, 0));
 
             }
 
             if (this.scene.Modules.InputHandler.keys["d"]) {
 
-                this.move(new Vec2(1, 0));
+                this.move(new Vec2(this.velocity, 0));
 
             }
 

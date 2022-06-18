@@ -25,15 +25,52 @@ document.addEventListener('DOMContentLoaded', async () => {
     let player = new Player(scene, new Vec2(64, 64));
     let enemy = new Entity(scene, 'player', new Vec2(128, 64));
 
-    // let tilemap = new TileMap();
+    let tilemap = new TileMap();
 
-    // tilemap.loadToScene(scene);
+    tilemap.loadToScene(scene);
 
-    // PhysicsManager.Detector([tilemap.group, player], () => {
+    PhysicsManager.Detector([tilemap.group, player], (collision, a, b) => {
 
-    //     player.position.x++;
+        let intersect = new Physics.Body(collision[0]).getOffset();
 
-    // })
+        let p;
+        let w;
+
+        if (player.body.uuid === a.uuid) {
+
+            p = a;
+            w = b;
+
+        }
+
+        if (player.body.uuid === b.uuid) {
+
+            p = b;
+            w = a;
+
+        }
+
+        let direction = {
+
+            x: Math.sign(p.AABB()[0].x - w.AABB()[0].x),
+            y: Math.sign(p.AABB()[0].y - w.AABB()[0].y)
+
+        }
+
+        let vec = new Vec2();
+        vec[intersect.key] = intersect.value * direction[intersect.key] * 2;
+
+        p.moveTo(Vec2.sum(
+            p.AABB()[0],
+            vec
+        ))
+
+        // p.velocity = Vec2.sum(
+        //     p.velocity,
+        //     new Vec2(-p.velocity.x,
+        //         -p.velocity.y))
+
+    })
 
     // Physics.Detector(scene, [player.bulletsPhysicsGroup, enemy], () => {
 

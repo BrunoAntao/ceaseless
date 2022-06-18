@@ -16,11 +16,15 @@ export class TileMap {
 
             for (let y = 0; y < 10; y++) {
 
-                let tile = new Entity(scene,
-                    'player',
-                    new Vec2(100 + x * 16, 100 + y * 16));
-                this.group.add(tile.getBody());
-                this.tiles.push(tile);
+                if (Math.random() > 0.5) {
+
+                    let tile = new Entity(scene,
+                        'player',
+                        new Vec2(100 + x * 16, 100 + y * 16));
+                    this.group.add(tile.getBody());
+                    this.tiles.push(tile);
+
+                }
 
             }
 
