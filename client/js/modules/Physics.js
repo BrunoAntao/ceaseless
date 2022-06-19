@@ -131,6 +131,8 @@ Physics.Body = class {
         this.rvecs = vecs;
         this.vecs = vecs;
 
+        this.angle = 0;
+
         this.velocity = new Vec2();
 
         this.collides = {};
@@ -138,6 +140,19 @@ Physics.Body = class {
     }
 
     update() {
+
+        if (this.owner instanceof Projectile) {
+
+            let ab = this.AABB();
+
+            let a = ab[0];
+            let b = ab[2];
+
+            let hx = (a.x + b.x) / 2;
+            let hy = (a.y + b.y) / 2;
+
+            this.rotateTo(this.owner.angle, new Vec2(hx, hy));
+        }
 
         this.velocity.x *= this.manager.friction;
         this.velocity.y *= this.manager.friction;
@@ -154,7 +169,36 @@ Physics.Body = class {
 
         }
 
-        this.moveTo(Vec2.sum(this.AABB()[0], this.velocity));
+        // this.moveTo(Vec2.sum(this.AABB()[0], this.velocity));
+
+        for (let i = 0; i < this.vecs.length; i++) {
+
+            const vec = this.vecs[i];
+            vec.x += this.velocity.x;
+            vec.y += this.velocity.y;
+
+        }
+
+    }
+
+    rotate(angle = new Angle(), center = new Vec2()) {
+
+        for (let i = 0; i < this.vecs.length; i++) {
+
+            this.vecs[i].rotate(angle, center);
+
+        }
+
+    }
+
+    rotateTo(angle = new Angle(), center = new Vec2()) {
+
+        if (angle - this.angle != Number.EPSILON) {
+
+            this.rotate(angle - this.angle, center);
+            this.angle = angle;
+
+        }
 
     }
 

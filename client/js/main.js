@@ -1,4 +1,4 @@
-import { Scene, GraphicObject } from '/js/modules/scene.js';
+import { Scene, Graphics } from '/js/modules/scene.js';
 import { AssetLoader, Sprite } from '/js/modules/AssetLoader.js';
 import { InputHandler } from '/js/modules/InputHandler.js';
 import { PhysicsModule, Physics, Entity } from '/js/modules/Physics.js';
@@ -102,12 +102,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         bullet.owner.remove();
 
     })
-
-    // PhysicsManager.Detector([player, enemy], () => {
-
-    //     enemy.remove();
-
-    // })
 
     scene.update = () => {
 
