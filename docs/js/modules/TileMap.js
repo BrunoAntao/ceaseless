@@ -13,8 +13,8 @@ export class TileMap {
 
     loadToScene(scene) {
 
-        this.spawn.x = Math.floor(Math.random() * scene.canvas.width / 16) * 16;
-        this.spawn.y = Math.floor(Math.random() * scene.canvas.height / 16) * 16;
+        this.spawn.x = Math.floor(Math.random() * scene.canvas.width / 16) * 32;
+        this.spawn.y = Math.floor(Math.random() * scene.canvas.height / 16) * 32;
 
         for (let x = 0; x < scene.canvas.width / 16; x++) {
 
