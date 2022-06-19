@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         let vec = new Vec2();
-        vec[intersect.key] = intersect.value * direction[intersect.key] * 1.5;
+        vec[intersect.key] = intersect.value * direction[intersect.key];
 
         p.moveTo(Vec2.sum(
             p.AABB()[0],

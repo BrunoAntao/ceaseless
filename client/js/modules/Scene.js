@@ -84,6 +84,12 @@ export class Scene {
 
         this.update();
 
+        for (const object of this.objects) {
+
+            object.update && object.update();
+
+        }
+
         const Modules = Object.values(this.Modules);
 
         for (const Module of Modules) {
@@ -94,7 +100,6 @@ export class Scene {
 
         for (const object of this.objects) {
 
-            object.update && object.update();
             object.render();
 
         }
