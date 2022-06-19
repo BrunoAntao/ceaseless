@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     scene.useModule(new InputHandler());
     const PhysicsManager = scene.useModule(new PhysicsModule({ drawBodies: true }));
 
-    Loader.loadSprite('player', '/assets/player.png', 16, 16);
+    Loader.loadSprite('player', 'assets/player.png', 16, 16);
 
     await Loader.loaded();
 
