@@ -4,10 +4,15 @@ import { Vec2 } from "/js/modules/Vec2.js";
 import { Intersect } from "/js/modules/Intersect.js";
 import { Graphics } from "/js/modules/Scene.js";
 
+let GUIDC = 0;
+
 function uuidv4() {
-    return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
-        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-    );
+
+    return GUIDC++;
+
+    // return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+    //     (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    // );
 }
 
 export const Physics = {};
@@ -348,6 +353,8 @@ Physics.Group = class {
 
     constructor() {
 
+        this.uuid = uuidv4();
+
         this.collides = {};
 
         this.bodies = [];
@@ -372,6 +379,7 @@ export class Entity extends Sprite {
         this.body = new Physics.Body.Square(this.asset.image.width);
         this.body.manager = scene.Modules.Physics;
         this.body.parent = scene.Modules.Physics;
+        this.body.owner = this;
         this.body.moveTo(position);
 
     }
@@ -399,10 +407,56 @@ export class Entity extends Sprite {
 
     render() {
 
+        // if (!(this instanceof Projectile)) {
+
         let pos = this.body.AABB()[0];
 
         this.position.x = pos.x + this.anchor.x * this.width;
         this.position.y = pos.y + this.anchor.y * this.height;
+
+        // }
+
+        super.render();
+
+    }
+
+}
+
+export class Projectile extends Entity {
+
+    constructor(scene, position = new Vec2(), angle = 0) {
+
+        super(scene, 'player', position);
+
+        this.angle = angle;
+        this.speed = 10;
+        this.anchor = { x: 0.5, y: 0.5 };
+
+        this.distance = 0;
+        this.lifeSpan = 500;
+
+    }
+
+    update() {
+
+        let dx = Math.cos(this.angle) * this.speed;
+        let dy = Math.sin(this.angle) * this.speed;
+
+        this.body.velocity = new Vec2(dx, dy);
+
+        this.distance += Math.sqrt(dx * dx + dy * dy);
+
+        if (this.distance > this.lifeSpan) {
+
+            this.remove();
+
+        }
+
+        super.update();
+
+    }
+
+    render() {
 
         super.render();
 

@@ -69,6 +69,15 @@ export class Sprite extends GraphicObject {
 
     }
 
+    cull() {
+
+        return this.position.x + this.width < 0 ||
+            this.position.x > this.scene.canvas.width ||
+            this.position.y + this.height < 0 ||
+            this.position.y > this.scene.canvas.height;
+
+    }
+
     update() { }
 
     render() {

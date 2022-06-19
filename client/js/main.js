@@ -31,6 +31,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log(tilemap.spawn);
     let player = new Player(scene, tilemap.spawn);
 
+    for (const object of scene.objects) {
+
+        object.cull();
+
+    }
+
     PhysicsManager.Detector([tilemap.group, player], (collision, a, b) => {
 
         let intersect = new Physics.Body(collision[0]).getOffset();
@@ -74,11 +80,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     })
 
-    // Physics.Detector(scene, [player.bulletsPhysicsGroup, enemy], () => {
+    PhysicsManager.Detector([player.bulletsPhysicsGroup, tilemap.group], (collision, a, b) => {
 
-    //     enemy.remove();
+        let bullet;
+        let tile
 
-    // })
+        if (a.parent == player.bulletsPhysicsGroup) {
+
+            bullet = a;
+            tile = b;
+
+        }
+
+        if (b.parent == player.bulletsPhysicsGroup) {
+
+            bullet = b;
+            tile = a;
+
+        }
+
+        bullet.owner.remove();
+
+    })
 
     // PhysicsManager.Detector([player, enemy], () => {
 

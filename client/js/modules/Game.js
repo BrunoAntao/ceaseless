@@ -1,4 +1,4 @@
-import { Physics, Entity } from '/js/modules/Physics.js';
+import { Physics, Entity, Projectile } from '/js/modules/Physics.js';
 import { Vec2 } from '/js/modules/Vec2.js';
 
 export class Player extends Entity {
@@ -55,14 +55,19 @@ export class Player extends Entity {
 
             }
 
-            //     if (this.scene.Modules.InputHandler.mouse.left) {
+            if (this.scene.Modules.InputHandler.mouse.left) {
 
-            //         if (Date.now() - this.lastFire > this.fireRate) {
-            //             let projectile = new Projectile(this.scene, this.position.clone(), this.position.angleBetween(new Vec2(this.scene.Modules.InputHandler.mouse.x, this.scene.Modules.InputHandler.mouse.y)));
-            //             this.bulletsPhysicsGroup.add(projectile.getBody());
-            //             this.lastFire = Date.now();
-            //         }
-            //     }
+                if (Date.now() - this.lastFire > this.fireRate) {
+                    let pos = this.position.clone();
+
+                    pos.x -= this.anchor.x * this.width;
+                    pos.y -= this.anchor.y * this.height;
+
+                    let projectile = new Projectile(this.scene, pos, this.position.angleBetween(new Vec2(this.scene.Modules.InputHandler.mouse.x, this.scene.Modules.InputHandler.mouse.y)));
+                    this.bulletsPhysicsGroup.add(projectile.getBody());
+                    this.lastFire = Date.now();
+                }
+            }
 
         }
 

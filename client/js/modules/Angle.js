@@ -1,4 +1,4 @@
-class Angle {
+export class Angle {
 
     constructor(radians = 0) {
 

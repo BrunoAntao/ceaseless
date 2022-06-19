@@ -22,7 +22,7 @@ export class TileMap {
 
                 if (x != this.spawn.x && y != this.spawn.y) {
 
-                    if (Math.random() > 0.5) {
+                    if (Math.random() > 0.99) {
 
                         let tile = new Entity(scene,
                             'player',

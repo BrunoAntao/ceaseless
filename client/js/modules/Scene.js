@@ -100,7 +100,11 @@ export class Scene {
 
         for (const object of this.objects) {
 
-            object.render();
+            if (!object.cull()) {
+
+                object.render();
+
+            }
 
         }
 
@@ -163,39 +167,3 @@ Graphics.DrawPath = (scene, body) => {
     scene.ctx.stroke();
 
 }
-
-// class Projectile extends Entity {
-
-//     constructor(scene, position = new Vec2(), angle = 0) {
-
-//         super(scene, position);
-
-//         this.angle = angle;
-//         this.speed = 10;
-
-//         this.distance = 0;
-//         this.lifeSpan = 500;
-
-//     }
-
-//     render() {
-
-//         let dx = Math.cos(this.angle) * this.speed;
-//         let dy = Math.sin(this.angle) * this.speed;
-
-//         this.position.x += dx;
-//         this.position.y += dy;
-
-//         this.distance += Math.sqrt(dx * dx + dy * dy);
-
-//         if (this.distance > this.lifeSpan) {
-
-//             this.remove();
-
-//         }
-
-//         super.render();
-
-//     }
-
-// }

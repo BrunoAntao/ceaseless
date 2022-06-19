@@ -1,3 +1,5 @@
+import { Angle } from '/js/modules/Angle.js';
+
 export class Vec2 {
 
     constructor(x = 0, y = 0) {
