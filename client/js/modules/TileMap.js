@@ -1,5 +1,5 @@
-import { Entity, Physics } from '/js/modules/Physics.js';
-import { Vec2 } from '/js/modules/Vec2.js';
+import { Entity, Physics } from './Physics.js';
+import { Vec2 } from './Vec2.js';
 
 export class TileMap {
 

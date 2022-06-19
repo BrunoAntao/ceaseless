@@ -1,10 +1,10 @@
-import { Scene, Graphics } from '/js/modules/scene.js';
-import { AssetLoader, Sprite } from '/js/modules/AssetLoader.js';
-import { InputHandler } from '/js/modules/InputHandler.js';
-import { PhysicsModule, Physics, Entity } from '/js/modules/Physics.js';
-import { Player } from '/js/modules/Game.js';
-import { Vec2 } from '/js/modules/Vec2.js';
-import { TileMap } from '/js/modules/Tilemap.js';
+import { Scene, Graphics } from './modules/Scene.js';
+import { AssetLoader, Sprite } from './modules/AssetLoader.js';
+import { InputHandler } from './modules/InputHandler.js';
+import { PhysicsModule, Physics, Entity } from './modules/Physics.js';
+import { Player } from './modules/Game.js';
+import { Vec2 } from './modules/Vec2.js';
+import { TileMap } from './modules/Tilemap.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
 

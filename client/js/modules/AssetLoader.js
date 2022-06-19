@@ -1,6 +1,6 @@
-import { Module } from "/js/modules/Module.js";
-import { GraphicObject } from "/js/modules/Scene.js";
-import { Vec2 } from '/js/modules/Vec2.js';
+import { Module } from "./Module.js";
+import { GraphicObject } from "./Scene.js";
+import { Vec2 } from './Vec2.js';
 
 export class AssetLoader extends Module {
 

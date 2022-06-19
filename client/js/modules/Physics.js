@@ -1,8 +1,8 @@
-import { Module } from "/js/modules/Module.js";
-import { Sprite } from "/js/modules/AssetLoader.js";
-import { Vec2 } from "/js/modules/Vec2.js";
-import { Intersect } from "/js/modules/Intersect.js";
-import { Graphics } from "/js/modules/Scene.js";
+import { Module } from "./Module.js";
+import { Sprite } from "./AssetLoader.js";
+import { Vec2 } from "./Vec2.js";
+import { Intersect } from "./Intersect.js";
+import { Graphics } from "./Scene.js";
 
 let GUIDC = 0;
 

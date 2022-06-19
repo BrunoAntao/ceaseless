@@ -1,4 +1,4 @@
-import { Module } from "/js/modules/Module.js";
+import { Module } from "./Module.js";
 
 export class InputHandler extends Module {
 

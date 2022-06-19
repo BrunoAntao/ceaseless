@@ -1,4 +1,4 @@
-import { Angle } from '/js/modules/Angle.js';
+import { Angle } from './Angle.js';
 
 export class Vec2 {
 

@@ -4,13 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon index"
+    "dev": "nodemon index",
+    "build-demo": "npx webpack --config webpack.config.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
-    "fs-extra": "^10.1.0",
     "nodemon": "^2.0.4",
     "socket.io": "^3.1.2",
     "socket.io-p2p-server": "^1.2.0"
