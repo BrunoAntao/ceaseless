@@ -308,13 +308,25 @@ Physics.collides = (a, b) => {
 
 Physics.AABBcollides = (a, b) => {
 
-    return Intersect(a.AABB(), b.AABB());
+    let aAABB = a.AABB();
+    let bAABB = b.AABB();
+
+    if (aAABB[0].x < bAABB[2].x &&
+        aAABB[2].x > bAABB[0].x &&
+        aAABB[0].y < bAABB[2].y &&
+        aAABB[2].y > bAABB[0].y) {
+
+        return true;
+
+    }
+
+    return false;
 
 }
 
 Physics.collisionUpdate = (a, b, collision) => {
 
-    if (Physics.AABBcollides(a, b).length > 0) {
+    if (Physics.AABBcollides(a, b)) {
 
         // console.log('AABB collides');
 

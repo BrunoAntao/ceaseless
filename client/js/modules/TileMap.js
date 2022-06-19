@@ -7,22 +7,30 @@ export class TileMap {
 
         this.tiles = [];
         this.group = new Physics.Group();
+        this.spawn = new Vec2();
 
     }
 
     loadToScene(scene) {
 
-        for (let x = 0; x < 10; x++) {
+        this.spawn.x = Math.floor(Math.random() * scene.canvas.width / 16);
+        this.spawn.y = Math.floor(Math.random() * scene.canvas.height / 16);
 
-            for (let y = 0; y < 10; y++) {
+        for (let x = 0; x < scene.canvas.width / 16; x++) {
 
-                if (Math.random() > 0.5) {
+            for (let y = 0; y < scene.canvas.height / 16; y++) {
 
-                    let tile = new Entity(scene,
-                        'player',
-                        new Vec2(100 + x * 16, 100 + y * 16));
-                    this.group.add(tile.getBody());
-                    this.tiles.push(tile);
+                if (x != this.spawn.x && y != this.spawn.y) {
+
+                    if (Math.random() > 0.5) {
+
+                        let tile = new Entity(scene,
+                            'player',
+                            new Vec2(x * 16, y * 16));
+                        this.group.add(tile.getBody());
+                        this.tiles.push(tile);
+
+                    }
 
                 }
 

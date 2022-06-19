@@ -22,12 +22,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     await Loader.loaded();
 
-    let player = new Player(scene, new Vec2(64, 64));
     // let enemy = new Entity(scene, 'player', new Vec2(128, 64));
 
     let tilemap = new TileMap();
 
     tilemap.loadToScene(scene);
+
+    console.log(tilemap.spawn);
+    let player = new Player(scene, tilemap.spawn);
 
     PhysicsManager.Detector([tilemap.group, player], (collision, a, b) => {
 
