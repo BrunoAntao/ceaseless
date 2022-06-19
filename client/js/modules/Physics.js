@@ -447,18 +447,19 @@ export class Entity extends Sprite {
 
         this.body.update();
 
-    }
-
-    render() {
-
-        // if (!(this instanceof Projectile)) {
-
         let pos = this.body.AABB()[0];
 
         this.position.x = pos.x + this.anchor.x * this.width;
         this.position.y = pos.y + this.anchor.y * this.height;
 
-        // }
+    }
+
+    render() {
+
+        let pos = this.body.AABB()[0];
+
+        this.position.x = pos.x + this.anchor.x * this.width;
+        this.position.y = pos.y + this.anchor.y * this.height;
 
         super.render();
 

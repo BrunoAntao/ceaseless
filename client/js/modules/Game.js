@@ -63,6 +63,8 @@ export class Player extends Entity {
                     pos.x -= this.anchor.x * this.width;
                     pos.y -= this.anchor.y * this.height;
 
+                    // console.log(this.position);
+
                     let projectile = new Projectile(this.scene, pos, this.position.angleBetween(new Vec2(this.scene.Modules.InputHandler.mouse.x, this.scene.Modules.InputHandler.mouse.y)));
                     this.bulletsPhysicsGroup.add(projectile.getBody());
                     this.lastFire = Date.now();
