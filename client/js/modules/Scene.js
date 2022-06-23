@@ -77,11 +77,6 @@ export class Scene {
 
         this.ctx.fillStyle = this.options.backgroundColor;
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-        this.ctx.fillStyle = "#ffffff";
-
-        this.ctx.fillText(this.fps, 8, 8 + this.textMetrics.actualBoundingBoxAscent);
-
         this.update();
 
         for (const object of this.objects) {
@@ -114,6 +109,11 @@ export class Scene {
 
         }
 
+        this.ctx.fillStyle = "#ffffff";
+
+        this.ctx.fillText(this.fps, 8, 8 + this.textMetrics.actualBoundingBoxAscent);
+
+
         this.renderFPS();
 
         requestAnimationFrame(() => { this.render() });
@@ -134,7 +134,11 @@ export class GraphicObject {
 
     remove() {
 
-        this.scene.objects.splice(this.scene.objects.indexOf(this), 1);
+        if (this.scene.objects.indexOf(this) > -1) {
+
+            this.scene.objects.splice(this.scene.objects.indexOf(this), 1);
+
+        }
 
     }
 

@@ -281,7 +281,7 @@ Physics.Body = class {
 
     remove() {
 
-        if (this.parent) {
+        if (this.parent && this.parent.bodies.indexOf(this) > -1) {
 
             this.parent.bodies.splice(this.parent.bodies.indexOf(this), 1);
 
@@ -534,10 +534,10 @@ export class Entity extends Sprite {
 
     render() {
 
-        let pos = this.body.AABB()[0];
+        // let pos = this.body.AABB()[0];
 
-        this.position.x = pos.x + this.anchor.x * this.width;
-        this.position.y = pos.y + this.anchor.y * this.height;
+        // this.position.x = pos.x + this.anchor.x * this.width;
+        // this.position.y = pos.y + this.anchor.y * this.height;
 
         super.render();
 
