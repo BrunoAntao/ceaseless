@@ -16,7 +16,7 @@ let gameScene = async () => {
 
     const Loader = scene.useModule(new AssetLoader());
     scene.useModule(new InputHandler());
-    const PhysicsManager = scene.useModule(new PhysicsModule({}));
+    const PhysicsManager = scene.useModule(new PhysicsModule({ drawBodies: true }));
 
     Loader.loadSprite('tile', 'assets/tile.png', 32, 32);
     Loader.loadSprite('player', 'assets/player.png', 16, 16);
@@ -56,67 +56,9 @@ let gameScene = async () => {
     console.log(tilemap.spawn);
     let player = new Player(scene, tilemap.spawn);
 
-    PhysicsManager.Detector([tilemap.group, player], (collision, a, b) => {
+    PhysicsManager.collidesWith([player, tilemap.group]);
 
-        let intersect = new Physics.Body(collision[0]).getOffset();
-
-        let p;
-        let w;
-
-        if (player.body.uuid === a.uuid) {
-
-            p = a;
-            w = b;
-
-        }
-
-        if (player.body.uuid === b.uuid) {
-
-            p = b;
-            w = a;
-
-        }
-
-        let direction = {
-
-            x: Math.sign(p.AABB()[0].x - w.AABB()[0].x),
-            y: Math.sign(p.AABB()[0].y - w.AABB()[0].y)
-
-        }
-
-        let vec = new Vec2();
-        vec[intersect.key] = intersect.value * direction[intersect.key];
-
-        p.moveTo(Vec2.sum(
-            p.AABB()[0],
-            vec
-        ))
-
-        // p.velocity = Vec2.sum(
-        //     p.velocity,
-        //     new Vec2(-p.velocity.x,
-        //         -p.velocity.y))
-
-    })
-
-    PhysicsManager.Detector([player.bulletsPhysicsGroup, tilemap.group], (collision, a, b) => {
-
-        let bullet;
-        let tile
-
-        if (a.parent == player.bulletsPhysicsGroup) {
-
-            bullet = a;
-            tile = b;
-
-        }
-
-        if (b.parent == player.bulletsPhysicsGroup) {
-
-            bullet = b;
-            tile = a;
-
-        }
+    PhysicsManager.Detector([player.bulletsPhysicsGroup, tilemap.group], (collision, bullet, tile) => {
 
         bullet.owner.remove();
 
@@ -150,32 +92,16 @@ let gameScene = async () => {
 
     }
 
-    PhysicsManager.Detector([player.bulletsPhysicsGroup, enemyGroup], (collision, a, b) => {
+    PhysicsManager.Detector([player.bulletsPhysicsGroup, enemyGroup], (collision, bullet, enemy) => {
 
-        a.owner.remove();
-        b.owner.remove();
+        bullet.owner.remove();
+        enemy.owner.remove();
 
         spawnEnemy();
 
     })
-    PhysicsManager.Detector([enemyGroup, tilemap.group], (collision, a, b) => {
 
-        let enemy;
-        let tile;
-
-        if (a.parent == enemyGroup) {
-
-            enemy = a;
-            tile = b;
-
-        }
-
-        if (b.parent == enemyGroup) {
-
-            enemy = b;
-            tile = a;
-
-        }
+    PhysicsManager.Detector([enemyGroup, tilemap.group], (collision, enemy, tile) => {
 
         enemy.owner.remove();
 

@@ -26,7 +26,8 @@ export class TileMap {
 
                     let tile = new Entity(scene,
                         tileData.key,
-                        new Vec2(x * asset.frameWidth, y * asset.frameHeight));
+                        new Vec2(x * asset.frameWidth, y * asset.frameHeight),
+                        { immovable: true });
                     this.group.add(tile.getBody());
                     this.tiles.push(tile);
 

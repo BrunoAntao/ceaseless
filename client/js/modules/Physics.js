@@ -69,7 +69,19 @@ export class PhysicsModule extends Module {
 
                     } else {
 
-                        Physics.collisionUpdate(a, b, collision);
+                        if (b instanceof Physics.Group) {
+
+                            for (const B of b.bodies) {
+
+                                Physics.collisionUpdate(a, B, collision);
+
+                            }
+
+                        } else {
+
+                            Physics.collisionUpdate(a, b, collision);
+
+                        }
 
                     }
 
@@ -115,9 +127,74 @@ export class PhysicsModule extends Module {
         this.bodies.indexOf(A) == -1 && this.bodies.push(A);
         this.bodies.indexOf(B) == -1 && this.bodies.push(B);
 
-        A.collides[B.uuid] = { body: B, cb };
-        B.collides[A.uuid] = { body: A, cb };
+        let subcb = (collision, a, b) => {
 
+            // let sa = (A instanceof Physics.Group && a.parent) || a;
+            let sb = (B instanceof Physics.Group && b.parent) || b;
+
+            let na = a;
+            let nb = b;
+
+            if (A === sb) {
+
+                na = b;
+                nb = a;
+
+            }
+
+            cb(collision, na, nb);
+
+        }
+
+        A.collides[B.uuid] = { body: B, cb: subcb };
+        B.collides[A.uuid] = { body: A, cb: subcb };
+
+    }
+
+    collidesWith([a, b]) {
+        this.Detector([a, b], (collision, a, b) => {
+
+            let intersect = new Physics.Body(collision[0]).getOffset();
+
+            if (a.options && a.options.immovable) {
+
+                let direction = {
+
+                    x: Math.sign(b.AABB()[0].x - a.AABB()[0].x),
+                    y: Math.sign(b.AABB()[0].y - a.AABB()[0].y)
+
+                }
+
+                let vec = new Vec2();
+                vec[intersect.key] = intersect.value * direction[intersect.key];
+
+                b.moveTo(Vec2.sum(
+                    b.AABB()[0],
+                    vec
+                ))
+
+            }
+
+            if (b.options && b.options.immovable) {
+
+                let direction = {
+
+                    x: Math.sign(a.AABB()[0].x - b.AABB()[0].x),
+                    y: Math.sign(a.AABB()[0].y - b.AABB()[0].y)
+
+                }
+
+                let vec = new Vec2();
+                vec[intersect.key] = intersect.value * direction[intersect.key];
+
+                a.moveTo(Vec2.sum(
+                    a.AABB()[0],
+                    vec
+                ))
+
+            }
+
+        })
     }
 
 }
@@ -416,11 +493,12 @@ Physics.Group = class {
 
 export class Entity extends Sprite {
 
-    constructor(scene, key, position = new Vec2()) {
+    constructor(scene, key, position = new Vec2(), options = {}) {
 
         super(scene, key, position)
 
         this.body = new Physics.Body.Square(this.asset.image.width);
+        this.body.options = options;
         this.body.manager = scene.Modules.Physics;
         this.body.parent = scene.Modules.Physics;
         this.body.owner = this;
