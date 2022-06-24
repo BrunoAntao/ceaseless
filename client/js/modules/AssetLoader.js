@@ -71,10 +71,12 @@ export class Sprite extends GraphicObject {
 
     cull() {
 
-        return this.position.x + this.width < 0 ||
-            this.position.x > this.scene.canvas.width ||
-            this.position.y + this.height < 0 ||
-            this.position.y > this.scene.canvas.height;
+        return false;
+
+        // return this.position.x + this.width < 0 ||
+        //     this.position.x > this.scene.canvas.width ||
+        //     this.position.y + this.height < 0 ||
+        //     this.position.y > this.scene.canvas.height;
 
     }
 
@@ -82,17 +84,21 @@ export class Sprite extends GraphicObject {
 
     render() {
 
-        if (this.angle) {
+        if (this.angle !== undefined) {
 
             this.scene.ctx.save();
 
-            this.scene.ctx.translate(this.position.x, this.position.y);
+            this.scene.ctx.translate(
+                this.position.x - this.anchor.x * this.width,
+                this.position.y - this.anchor.y * this.height
+            );
+
             this.scene.ctx.rotate(this.angle);
 
             this.scene.ctx.drawImage(
                 this.asset.image,
-                -(this.anchor.x * this.width),
-                -(this.anchor.y * this.height)
+                0,
+                0
             );
 
             this.scene.ctx.restore();

@@ -16,14 +16,14 @@ let gameScene = async () => {
 
     const Loader = scene.useModule(new AssetLoader());
     scene.useModule(new InputHandler());
-    const PhysicsManager = scene.useModule(new PhysicsModule({ drawBodies: true }));
+    const PhysicsManager = scene.useModule(new PhysicsModule({
+        // drawBodies: true
+    }));
 
     Loader.loadSprite('tile', 'assets/tile.png', 32, 32);
     Loader.loadSprite('player', 'assets/player.png', 16, 16);
 
     await Loader.loaded();
-
-    // let enemy = new Entity(scene, 'player', new Vec2(128, 64));
 
     let width = 20;
     let height = 18;
@@ -54,7 +54,7 @@ let gameScene = async () => {
     tilemap.loadToScene(scene);
 
     console.log(tilemap.spawn);
-    let player = new Player(scene, tilemap.spawn);
+    let player = new Player(scene, new Vec2(32 + 16, 32 + 16));
 
     PhysicsManager.collidesWith([player, tilemap.group]);
 

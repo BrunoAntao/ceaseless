@@ -156,7 +156,7 @@ export class PhysicsModule extends Module {
 
             let intersect = new Physics.Body(collision[0]).getOffset();
 
-            if (a.options && a.options.immovable) {
+            if (a.options && a.options.Physics && a.options.Physics.immovable) {
 
                 let direction = {
 
@@ -175,7 +175,7 @@ export class PhysicsModule extends Module {
 
             }
 
-            if (b.options && b.options.immovable) {
+            if (b.options && b.options.Physics && b.options.Physics.immovable) {
 
                 let direction = {
 
@@ -201,12 +201,14 @@ export class PhysicsModule extends Module {
 
 Physics.Body = class {
 
-    constructor(vecs = []) {
+    constructor(vecs = [], options) {
 
         this.uuid = uuidv4();
 
         this.rvecs = vecs;
         this.vecs = vecs;
+
+        this.options = options;
 
         this.angle = 0;
 
@@ -290,12 +292,6 @@ Physics.Body = class {
     }
 
     moveTo(position) {
-
-        if (position instanceof Entity) {
-
-            position = Vec2.sum(position.position, new Vec2(-position.anchor.x * position.width, -position.anchor.y * position.height))
-
-        }
 
         let nvecs = [];
 
@@ -411,7 +407,7 @@ Physics.Body = class {
 
 Physics.Body.Square = class extends Physics.Body {
 
-    constructor(size) {
+    constructor(size, options) {
 
         let vecs = [
             new Vec2(0, 0),
@@ -420,7 +416,7 @@ Physics.Body.Square = class extends Physics.Body {
             new Vec2(0, size),
         ]
 
-        super(vecs);
+        super(vecs, options);
 
     }
 
@@ -497,12 +493,15 @@ export class Entity extends Sprite {
 
         super(scene, key, position)
 
-        this.body = new Physics.Body.Square(this.asset.image.width);
-        this.body.options = options;
+        this.anchor = options.anchor || this.anchor;
+
+        this.body = new Physics.Body.Square(this.asset.image.width, options);
         this.body.manager = scene.Modules.Physics;
         this.body.parent = scene.Modules.Physics;
         this.body.owner = this;
-        this.body.moveTo(position);
+
+        this.body.moveTo(new Vec2(this.position.x - this.anchor.x * this.width,
+            this.position.y - this.anchor.y * this.height));
 
     }
 
@@ -525,19 +524,14 @@ export class Entity extends Sprite {
 
         this.body.update();
 
-        let pos = this.body.AABB()[0];
-
-        this.position.x = pos.x + this.anchor.x * this.width;
-        this.position.y = pos.y + this.anchor.y * this.height;
-
     }
 
     render() {
 
-        // let pos = this.body.AABB()[0];
+        let pos = this.body.vecs[0];
 
-        // this.position.x = pos.x + this.anchor.x * this.width;
-        // this.position.y = pos.y + this.anchor.y * this.height;
+        this.position.x = pos.x + this.anchor.x * this.width;
+        this.position.y = pos.y + this.anchor.y * this.height;
 
         super.render();
 
@@ -549,11 +543,16 @@ export class Projectile extends Entity {
 
     constructor(scene, position = new Vec2(), angle = 0) {
 
-        super(scene, 'player', position);
+        let options = {
+
+            anchor: new Vec2(0.5, 0.5)
+
+        }
+
+        super(scene, 'player', position, options);
 
         this.angle = angle;
         this.speed = 10;
-        this.anchor = { x: 0.5, y: 0.5 };
 
         this.distance = 0;
         this.lifeSpan = 500;
@@ -576,12 +575,6 @@ export class Projectile extends Entity {
         }
 
         super.update();
-
-    }
-
-    render() {
-
-        super.render();
 
     }
 

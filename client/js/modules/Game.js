@@ -5,9 +5,13 @@ export class Player extends Entity {
 
     constructor(scene, position = new Vec2()) {
 
-        super(scene, 'player', position)
+        let options = {
 
-        this.anchor = new Vec2(0.5, 0.5);
+            anchor: new Vec2(0.5, 0.5)
+
+        }
+
+        super(scene, 'player', position, options)
 
         this.fireRate = 100;
         this.lastFire = 0;
@@ -58,14 +62,18 @@ export class Player extends Entity {
             if (this.scene.Modules.InputHandler.mouse.left) {
 
                 if (Date.now() - this.lastFire > this.fireRate) {
-                    let pos = this.position.clone();
 
-                    pos.x -= this.anchor.x * this.width;
-                    pos.y -= this.anchor.y * this.height;
+                    let projectile = new Projectile(
+                        this.scene,
+                        this.position.clone(),
+                        this.position.angleBetween(
+                            new Vec2(
+                                this.scene.Modules.InputHandler.mouse.x,
+                                this.scene.Modules.InputHandler.mouse.y
+                            )
+                        )
+                    );
 
-                    // console.log(this.position);
-
-                    let projectile = new Projectile(this.scene, pos, this.position.angleBetween(new Vec2(this.scene.Modules.InputHandler.mouse.x, this.scene.Modules.InputHandler.mouse.y)));
                     this.bulletsPhysicsGroup.add(projectile.getBody());
                     this.lastFire = Date.now();
                 }
