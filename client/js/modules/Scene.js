@@ -9,11 +9,34 @@ export class Scene {
             width: 800,
             height: 600,
 
+            // resize: true,
+            // maintainAspectRatio: true,
+
             backgroundColor: "rgba(0,0,0,0)",
 
             container: document.body,
 
         }, options);
+
+        // if (this.options.resize) {
+
+        //     window.addEventListener('resize', () => {
+
+        //         this.canvas.style.width = '100%';
+        //         this.canvas.style.height = '100%';
+
+        //         const bestRatio = Math.min(
+        //             this.canvas.offsetWidth / this.canvas.width,
+        //             this.canvas.offsetHeight / this.canvas.height);
+        //         this.canvas.width *= bestRatio;
+        //         this.canvas.height *= bestRatio;
+
+        //         console.log(this.canvas.width);
+        //         console.log(this.canvas.height);
+
+        //     })
+
+        // }
 
         this.canvas = document.createElement('canvas');
         this.canvas.width = this.options.width;
@@ -21,18 +44,23 @@ export class Scene {
         this.ctx = this.canvas.getContext("2d");
         this.options.container.append(this.canvas);
 
+        this.ctx.imageSmoothingEnabled = false;
+        let style = document.createElement('style');
+        style.textContent = `
+        canvas {
+            image-rendering: -moz-crisp-edges;
+            image-rendering: -webkit-crisp-edges;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+        `
+        document.head.appendChild(style);
+
         this.objects = [];
 
         this.Modules = {};
 
-        this.lastCalledTime;
-        this.lastTimestamp;
-        this.fps;
-
-        this.ctx.font = "20px Arial";
-        this.textMetrics = this.ctx.measureText(this.fps);
-
-        requestAnimationFrame(() => { this.render() });
+        requestAnimationFrame((step) => { this.render(step) });
 
     }
 
@@ -45,38 +73,14 @@ export class Scene {
 
     }
 
-    renderFPS() {
-
-        if (!this.lastCalledTime) {
-
-            this.lastTimestamp = performance.now();
-            this.lastCalledTime = performance.now();
-            this.fps = 0;
-            return;
-
-        }
-
-        let delta = (performance.now() - this.lastCalledTime) / 1000;
-
-        this.lastCalledTime = performance.now();
-
-        if (performance.now() - this.lastTimestamp > 1000) {
-
-            this.lastTimestamp = performance.now();
-            this.fps = "FPS: " + Math.floor(1 / delta);
-
-        }
-
-    }
-
     update() { }
 
-    render() {
+    render(step) {
 
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
         this.ctx.fillStyle = this.options.backgroundColor;
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
         this.update();
 
         for (const object of this.objects) {
@@ -95,9 +99,9 @@ export class Scene {
 
         for (const object of this.objects) {
 
-            if (!object.cull()) {
+            if (object.inBounds()) {
 
-                object.render();
+                object.render(step);
 
             }
 
@@ -109,14 +113,7 @@ export class Scene {
 
         }
 
-        this.ctx.fillStyle = "#ffffff";
-
-        this.ctx.fillText(this.fps, 8, 8 + this.textMetrics.actualBoundingBoxAscent);
-
-
-        this.renderFPS();
-
-        requestAnimationFrame(() => { this.render() });
+        requestAnimationFrame((step) => { this.render(step) });
 
     }
 
@@ -148,19 +145,19 @@ export class GraphicObject {
 
 export const Graphics = {};
 
-Graphics.DrawPath = (scene, body) => {
+Graphics.DrawPath = (scene, vecs, color = '#ff0000') => {
 
-    scene.ctx.strokeStyle = '#ff00ff';
+    scene.ctx.strokeStyle = color;
 
     scene.ctx.beginPath();
 
-    const first = body.vecs[0];
+    const first = vecs[0];
 
     scene.ctx.moveTo(first.x, first.y);
 
-    for (let i = 1; i < body.vecs.length; i++) {
+    for (let i = 1; i < vecs.length; i++) {
 
-        const vec = body.vecs[i];
+        const vec = vecs[i];
 
         scene.ctx.lineTo(vec.x, vec.y);
 

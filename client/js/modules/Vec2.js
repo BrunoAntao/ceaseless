@@ -15,6 +15,13 @@ export class Vec2 {
 
     }
 
+    sum(vec = new Vec2()) {
+
+        this.x += vec.x;
+        this.y += vec.y;
+
+    }
+
     clone() {
 
         return new Vec2(this.x, this.y);
@@ -44,7 +51,7 @@ export class Vec2 {
 
         const currentAngle = this.angleBetween(center);
 
-        if (angle - currentAngle != Number.EPSILON) {
+        if (angle - currentAngle !== Number.EPSILON) {
 
             this.rotate(angle - currentAngle, center);
 

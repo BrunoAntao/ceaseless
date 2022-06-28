@@ -103,13 +103,13 @@ export class PhysicsModule extends Module {
 
                     for (const a of body.bodies) {
 
-                        Graphics.DrawPath(this.scene, a);
+                        Graphics.DrawPath(this.scene, a.vecs);
 
                     }
 
                 } else {
 
-                    Graphics.DrawPath(this.scene, body);
+                    Graphics.DrawPath(this.scene, body.vecs);
 
                 }
 
@@ -422,6 +422,23 @@ Physics.Body.Square = class extends Physics.Body {
 
 }
 
+Physics.Body.Rectangle = class extends Physics.Body {
+
+    constructor(width, height, options) {
+
+        let vecs = [
+            new Vec2(0, 0),
+            new Vec2(width, 0),
+            new Vec2(width, height),
+            new Vec2(0, height),
+        ]
+
+        super(vecs, options);
+
+    }
+
+}
+
 Physics.collides = (a, b) => {
 
     return Intersect(a.vecs, b.vecs);
@@ -487,95 +504,95 @@ Physics.Group = class {
 
 }
 
-export class Entity extends Sprite {
+// export class Entity extends Sprite {
 
-    constructor(scene, key, position = new Vec2(), options = {}) {
+//     constructor(scene, key, position = new Vec2(), options = {}) {
 
-        super(scene, key, position)
+//         super(scene, key, position)
 
-        this.anchor = options.anchor || this.anchor;
+//         this.anchor = options.anchor || this.anchor;
 
-        this.body = new Physics.Body.Square(this.asset.image.width, options);
-        this.body.manager = scene.Modules.Physics;
-        this.body.parent = scene.Modules.Physics;
-        this.body.owner = this;
+//         this.body = new Physics.Body.Square(this.asset.image.height, options);
+//         this.body.manager = scene.Modules.Physics;
+//         this.body.parent = scene.Modules.Physics;
+//         this.body.owner = this;
 
-        this.body.moveTo(new Vec2(this.position.x - this.anchor.x * this.width,
-            this.position.y - this.anchor.y * this.height));
+//         this.body.moveTo(new Vec2(this.position.x - this.anchor.x * this.width,
+//             this.position.y - this.anchor.y * this.height));
 
-    }
+//     }
 
-    remove() {
+//     remove() {
 
-        this.body.remove();
-        super.remove();
+//         this.body.remove();
+//         super.remove();
 
-    }
+//     }
 
-    getBody() {
+//     getBody() {
 
-        return this.body;
+//         return this.body;
 
-    }
+//     }
 
-    collides() { }
+//     collides() { }
 
-    update() {
+//     update() {
 
-        this.body.update();
+//         this.body.update();
 
-    }
+//     }
 
-    render() {
+//     render() {
 
-        let pos = this.body.vecs[0];
+//         let pos = this.body.vecs[0];
 
-        this.position.x = pos.x + this.anchor.x * this.width;
-        this.position.y = pos.y + this.anchor.y * this.height;
+//         this.position.x = pos.x + this.anchor.x * this.width;
+//         this.position.y = pos.y + this.anchor.y * this.height;
 
-        super.render();
+//         super.render();
 
-    }
+//     }
 
-}
+// }
 
-export class Projectile extends Entity {
+// export class Projectile extends Entity {
 
-    constructor(scene, position = new Vec2(), angle = 0) {
+//     constructor(scene, key, position = new Vec2(), angle = 0) {
 
-        let options = {
+//         let options = {
 
-            anchor: new Vec2(0.5, 0.5)
+//             anchor: new Vec2(0.5, 0.5)
 
-        }
+//         }
 
-        super(scene, 'player', position, options);
+//         super(scene, key, position, options);
 
-        this.angle = angle;
-        this.speed = 10;
+//         this.angle = angle;
+//         this.speed = 10;
 
-        this.distance = 0;
-        this.lifeSpan = 500;
+//         this.distance = 0;
+//         this.lifeSpan = 500;
 
-    }
+//     }
 
-    update() {
+//     update() {
 
-        let dx = Math.cos(this.angle) * this.speed;
-        let dy = Math.sin(this.angle) * this.speed;
+//         let dx = Math.cos(this.angle) * this.speed;
+//         let dy = Math.sin(this.angle) * this.speed;
 
-        this.body.velocity = new Vec2(dx, dy);
+//         this.body.velocity = new Vec2(dx, dy);
 
-        this.distance += Math.sqrt(dx * dx + dy * dy);
+//         this.distance += Math.sqrt(dx * dx + dy * dy);
 
-        if (this.distance > this.lifeSpan) {
+//         if (this.distance > this.lifeSpan) {
 
-            this.remove();
+//             this.remove();
 
-        }
+//         }
 
-        super.update();
+//         super.update();
 
-    }
+//     }
 
-}
+// }
