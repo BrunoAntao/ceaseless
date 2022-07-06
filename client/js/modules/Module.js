@@ -8,6 +8,7 @@ export class Module {
     }
 
     update() { }
+    preRender() { }
     render() { }
 
     register(scene) {

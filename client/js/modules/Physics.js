@@ -1,8 +1,9 @@
 import { Module } from "./Module.js";
 import { Sprite } from "./AssetLoader.js";
 import { Vec2 } from "./Vec2.js";
-import { Intersect } from "./Intersect.js";
+import { Intersect, AABBIntersect } from "./Intersect.js";
 import { Graphics } from "./Scene.js";
+import { Angle } from "./Angle.js";
 
 let GUIDC = 0;
 
@@ -121,8 +122,8 @@ export class PhysicsModule extends Module {
 
     Detector([a, b], cb) {
 
-        let A = (a instanceof Physics.Group && a) || a.getBody();
-        let B = (b instanceof Physics.Group && b) || b.getBody();
+        let A = (a instanceof Physics.Group && a) || a.body;
+        let B = (b instanceof Physics.Group && b) || b.body;
 
         this.bodies.indexOf(A) == -1 && this.bodies.push(A);
         this.bodies.indexOf(B) == -1 && this.bodies.push(B);
@@ -201,12 +202,14 @@ export class PhysicsModule extends Module {
 
 Physics.Body = class {
 
-    constructor(vecs = [], options) {
+    constructor(vecs = [], options = {}) {
 
         this.uuid = uuidv4();
 
         this.rvecs = vecs;
-        this.vecs = vecs;
+        this.vecs = [...this.rvecs];
+
+        this.anchor = new Vec2(0, 0);
 
         this.options = options;
 
@@ -218,20 +221,57 @@ Physics.Body = class {
 
     }
 
-    update() {
+    attach(graphicObject) {
 
-        if (this.owner instanceof Projectile) {
+        this.rvecs = graphicObject.bounds.rvecs;
+        this.anchor = graphicObject.anchor;
+        graphicObject.anchor = new Vec2(0, 0);
 
-            let ab = this.AABB();
+        this.manager = graphicObject.scene.Modules.Physics;
+        this.parent = graphicObject.scene.Modules.Physics;
+        this.owner = graphicObject;
 
-            let a = ab[0];
-            let b = ab[2];
+        this.moveTo(
+            new Vec2(
+                graphicObject.position.x - graphicObject.anchor.x * graphicObject.asset.frameWidth,
+                graphicObject.position.y - graphicObject.anchor.y * graphicObject.asset.frameHeight
+            )
+        );
 
-            let hx = (a.x + b.x) / 2;
-            let hy = (a.y + b.y) / 2;
+        const oUpdate = graphicObject.update;
+        graphicObject.update = () => {
 
-            this.rotateTo(this.owner.angle, new Vec2(hx, hy));
+            this.update();
+            oUpdate.call(graphicObject);
+
         }
+
+        const oRender = graphicObject.render;
+        graphicObject.render = () => {
+
+            let pos = this.vecs[0];
+
+            graphicObject.position.x = pos.x;
+            graphicObject.position.y = pos.y;
+
+            oRender.call(graphicObject);
+
+        }
+
+        const oRemove = graphicObject.remove;
+
+        graphicObject.remove = () => {
+
+            this.remove();
+            oRemove.call(graphicObject);
+
+        }
+
+        return this;
+
+    }
+
+    update() {
 
         this.velocity.x *= this.manager.friction;
         this.velocity.y *= this.manager.friction;
@@ -248,8 +288,6 @@ Physics.Body = class {
 
         }
 
-        // this.moveTo(Vec2.sum(this.AABB()[0], this.velocity));
-
         for (let i = 0; i < this.vecs.length; i++) {
 
             const vec = this.vecs[i];
@@ -257,6 +295,15 @@ Physics.Body = class {
             vec.y += this.velocity.y;
 
         }
+
+        let ab = this.AABB()[0];
+
+        this.rotateTo(this.owner.angle,
+            new Vec2(
+                ab.x + this.anchor.x * this.owner.asset.frameWidth,
+                ab.y + this.anchor.y * this.owner.asset.frameHeight
+            )
+        );
 
     }
 
@@ -441,7 +488,7 @@ Physics.Body.Rectangle = class extends Physics.Body {
 
 Physics.collides = (a, b) => {
 
-    return Intersect(a.vecs, b.vecs);
+    return Intersect([...a.vecs], [...b.vecs]);
 
 }
 
@@ -450,16 +497,7 @@ Physics.AABBcollides = (a, b) => {
     let aAABB = a.AABB();
     let bAABB = b.AABB();
 
-    if (aAABB[0].x < bAABB[2].x &&
-        aAABB[2].x > bAABB[0].x &&
-        aAABB[0].y < bAABB[2].y &&
-        aAABB[2].y > bAABB[0].y) {
-
-        return true;
-
-    }
-
-    return false;
+    return AABBIntersect(aAABB, bAABB);
 
 }
 
@@ -503,96 +541,3 @@ Physics.Group = class {
     }
 
 }
-
-// export class Entity extends Sprite {
-
-//     constructor(scene, key, position = new Vec2(), options = {}) {
-
-//         super(scene, key, position)
-
-//         this.anchor = options.anchor || this.anchor;
-
-//         this.body = new Physics.Body.Square(this.asset.image.height, options);
-//         this.body.manager = scene.Modules.Physics;
-//         this.body.parent = scene.Modules.Physics;
-//         this.body.owner = this;
-
-//         this.body.moveTo(new Vec2(this.position.x - this.anchor.x * this.width,
-//             this.position.y - this.anchor.y * this.height));
-
-//     }
-
-//     remove() {
-
-//         this.body.remove();
-//         super.remove();
-
-//     }
-
-//     getBody() {
-
-//         return this.body;
-
-//     }
-
-//     collides() { }
-
-//     update() {
-
-//         this.body.update();
-
-//     }
-
-//     render() {
-
-//         let pos = this.body.vecs[0];
-
-//         this.position.x = pos.x + this.anchor.x * this.width;
-//         this.position.y = pos.y + this.anchor.y * this.height;
-
-//         super.render();
-
-//     }
-
-// }
-
-// export class Projectile extends Entity {
-
-//     constructor(scene, key, position = new Vec2(), angle = 0) {
-
-//         let options = {
-
-//             anchor: new Vec2(0.5, 0.5)
-
-//         }
-
-//         super(scene, key, position, options);
-
-//         this.angle = angle;
-//         this.speed = 10;
-
-//         this.distance = 0;
-//         this.lifeSpan = 500;
-
-//     }
-
-//     update() {
-
-//         let dx = Math.cos(this.angle) * this.speed;
-//         let dy = Math.sin(this.angle) * this.speed;
-
-//         this.body.velocity = new Vec2(dx, dy);
-
-//         this.distance += Math.sqrt(dx * dx + dy * dy);
-
-//         if (this.distance > this.lifeSpan) {
-
-//             this.remove();
-
-//         }
-
-//         super.update();
-
-//     }
-
-// }

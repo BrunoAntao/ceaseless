@@ -1,5 +1,5 @@
 import { Module } from "./Module.js";
-import { Physics } from "./Physics.js";
+import { AABBIntersect } from "./Intersect.js";
 import { GraphicObject, Graphics } from "./Scene.js";
 import { Vec2 } from './Vec2.js';
 
@@ -52,6 +52,18 @@ export class AssetLoader extends Module {
 
             }
             image.src = path;
+
+        }));
+
+    }
+
+    loadTileMap(key, path) {
+
+        this.load(key, new Promise((resolve) => {
+
+            fetch(path)
+                .then(response => response.json())
+                .then(data => resolve(data));
 
         }));
 
@@ -247,29 +259,20 @@ export class Sprite extends GraphicObject {
 
     }
 
+    update() { }
+
     inBounds() {
 
         this.bounds.update(this);
 
-        return Physics.AABBcollides(
-            this.scene.Modules.AssetLoader.bounds,
-            this.bounds);
+        return AABBIntersect(
+            this.scene.Modules.AssetLoader.bounds.AABB(),
+            this.bounds.AABB()
+        );
 
     }
 
     render() {
-
-        // if (this.asset.frames) {
-
-        //     this.frame++;
-
-        //     if (this.frame >= this.asset.frames) {
-
-        //         this.frame = 1;
-
-        //     }
-
-        // }
 
         this.scene.ctx.save();
 

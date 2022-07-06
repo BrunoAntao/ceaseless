@@ -1,120 +1,147 @@
-// import { Physics, Entity, Projectile } from './Physics.js';
-// import { Vec2 } from './Vec2.js';
+import { Physics } from './Physics.js';
+import { Sprite } from './AssetLoader.js';
+import { Vec2 } from './Vec2.js';
 
-// export class Player extends Entity {
+export class Projectile extends Sprite {
 
-//     constructor(scene, position = new Vec2()) {
+    constructor(scene, key, position = new Vec2(), angle = 0) {
 
-//         let options = {
+        super(scene, key, position);
 
-//             anchor: new Vec2(0.5, 0.5)
+        this.anchor = new Vec2(0.5, 0.5);
 
-//         }
+        this.angle = angle;
 
-//         super(scene, 'test', position, options)
+        this.body = new Physics.Body().attach(this);
 
-//         this.scale = new Vec2(2, 2);
+        this.speed = 2;
+        this.distance = 0;
+        this.lifeSpan = 200;
 
-//         this.fireRate = 100;
-//         this.lastFire = 0;
+    }
 
-//         this.velocity = 0.6;
+    update() {
 
-//         this.bulletsPhysicsGroup = new Physics.Group();
+        let dx = Math.cos(this.angle) * this.speed;
+        let dy = Math.sin(this.angle) * this.speed;
 
-//         this.anchor = options.anchor || this.anchor;
-//         this.body = new Physics.Body.Rectangle(this.asset.image.width * this.scale.x, this.asset.image.height * this.scale.y, options);
-//         this.body.manager = scene.Modules.Physics;
-//         this.body.parent = scene.Modules.Physics;
-//         this.body.owner = this;
-//         this.body.moveTo(new Vec2(this.position.x - this.anchor.x * this.width,
-//             this.position.y - this.anchor.y * this.height));
+        this.body.velocity = new Vec2(dx, dy);
 
-//         this.hp = 10;
-//         this.lastDamage = 0;
-//         this.iWindow = 500;
+        this.distance += Math.sqrt(dx * dx + dy * dy);
 
-//     }
+        if (this.distance > this.lifeSpan) {
 
-//     damage(damage) {
+            this.remove();
 
-//         if (Date.now() - this.lastDamage > this.iWindow) {
+        }
 
-//             this.hp -= damage;
-//             this.lastDamage = Date.now();
+        super.update();
 
-//         }
+    }
 
-//     }
+}
 
-//     move(vec = new Vec2()) {
+export class Player extends Sprite {
 
-//         let body = this.getBody();
-//         body.velocity = Vec2.sum(body.velocity, vec);
+    constructor(scene, position = new Vec2()) {
 
-//     }
+        super(scene, 'player', position)
 
-//     update() {
+        this.anchor = new Vec2(0.5, 0.5);
 
-//         if (this.hp < 1) {
+        this.fireRate = 100;
+        this.lastFire = 0;
 
-//             this.remove();
+        this.velocity = 0.6;
 
-//         }
+        this.bulletsPhysicsGroup = new Physics.Group();
 
-//         super.update();
+        this.body = new Physics.Body().attach(this);
 
-//         if (this.scene.Modules.InputHandler) {
+        this.hp = 10;
+        this.lastDamage = 0;
+        this.iWindow = 500;
 
-//             if (this.scene.Modules.InputHandler.keys["w"]) {
+    }
 
-//                 this.move(new Vec2(0, -this.velocity));
+    damage(damage) {
 
-//             }
+        if (Date.now() - this.lastDamage > this.iWindow) {
 
-//             if (this.scene.Modules.InputHandler.keys["s"]) {
+            this.hp -= damage;
+            this.lastDamage = Date.now();
 
-//                 this.move(new Vec2(0, this.velocity));
+        }
 
-//             }
+    }
 
-//             if (this.scene.Modules.InputHandler.keys["a"]) {
+    move(vec = new Vec2()) {
 
-//                 this.move(new Vec2(-this.velocity, 0));
+        this.body.velocity = Vec2.sum(this.body.velocity, vec);
 
-//             }
+    }
 
-//             if (this.scene.Modules.InputHandler.keys["d"]) {
+    update() {
 
-//                 this.move(new Vec2(this.velocity, 0));
+        super.update();
 
-//             }
+        if (this.hp < 1) {
 
-//             if (this.scene.Modules.InputHandler.mouse.left) {
+            this.remove();
 
-//                 if (Date.now() - this.lastFire > this.fireRate) {
+        }
 
-//                     let projectile = new Projectile(
-//                         this.scene,
-//                         'test_projectile',
-//                         Vec2.sum(this.position.clone(), new Vec2(0, 10)),
-//                         this.position.angleBetween(
-//                             new Vec2(
-//                                 this.scene.Modules.InputHandler.mouse.x,
-//                                 this.scene.Modules.InputHandler.mouse.y
-//                             )
-//                         )
-//                     );
+        if (this.scene.Modules.InputHandler) {
 
-//                     projectile.scale = new Vec2(4, 4);
+            if (this.scene.Modules.InputHandler.keys["w"]) {
 
-//                     this.bulletsPhysicsGroup.add(projectile.getBody());
-//                     this.lastFire = Date.now();
-//                 }
-//             }
+                this.move(new Vec2(0, -this.velocity));
 
-//         }
+            }
 
-//     }
+            if (this.scene.Modules.InputHandler.keys["s"]) {
 
-// }
+                this.move(new Vec2(0, this.velocity));
+
+            }
+
+            if (this.scene.Modules.InputHandler.keys["a"]) {
+
+                this.move(new Vec2(-this.velocity, 0));
+
+            }
+
+            if (this.scene.Modules.InputHandler.keys["d"]) {
+
+                this.move(new Vec2(this.velocity, 0));
+
+            }
+
+            if (this.scene.Modules.InputHandler.mouse.left) {
+
+                if (Date.now() - this.lastFire > this.fireRate) {
+
+                    let projectile = new Projectile(
+                        this.scene,
+                        'test_projectile',
+                        this.position.clone(),
+                        this.position.angleBetween(
+                            new Vec2(
+                                this.scene.Modules.InputHandler.mouse.x,
+                                this.scene.Modules.InputHandler.mouse.y
+                            )
+                        )
+                    );
+
+                    // projectile.scale = new Vec2(4, 4);
+
+                    this.bulletsPhysicsGroup.add(projectile.body);
+                    this.lastFire = Date.now();
+                }
+            }
+
+        }
+
+    }
+
+}

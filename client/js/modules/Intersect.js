@@ -1,3 +1,18 @@
+export function AABBIntersect(aAABB, bAABB) {
+
+  if (aAABB[0].x < bAABB[2].x &&
+    aAABB[2].x > bAABB[0].x &&
+    aAABB[0].y < bAABB[2].y &&
+    aAABB[2].y > bAABB[0].y) {
+
+    return true;
+
+  }
+
+  return false;
+
+}
+
 export function Intersect(fig1, fig2) {
   for (let i = 0; i < fig1.length; i++) {
     fig1[i].x = +((fig1[i].x).toFixed(9));
@@ -471,7 +486,7 @@ function getSize(polygon) {
   return size;
 }
 
-function findPointInsidePolygon(point, polygon) {
+export function findPointInsidePolygon(point, polygon) {
   let cross = 0;
   let edges = getEdges(polygon);
   let classify;

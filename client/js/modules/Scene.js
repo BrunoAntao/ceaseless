@@ -101,6 +101,12 @@ export class Scene {
 
             if (object.inBounds()) {
 
+                for (const Module of Modules) {
+
+                    Module.preRender(object);
+
+                }
+
                 object.render(step);
 
             }
@@ -126,6 +132,8 @@ export class GraphicObject {
         this.scene = scene;
         this.scene.objects.push(this);
         this.position = position;
+
+        this.Modules = {};
 
     }
 
@@ -166,5 +174,29 @@ Graphics.DrawPath = (scene, vecs, color = '#ff0000') => {
     scene.ctx.closePath();
 
     scene.ctx.stroke();
+
+}
+
+Graphics.FillPath = (ctx, vecs, color = '#ff0000') => {
+
+    ctx.fillStyle = color;
+
+    ctx.beginPath();
+
+    const first = vecs[0];
+
+    ctx.moveTo(first.x, first.y);
+
+    for (let i = 1; i < vecs.length; i++) {
+
+        const vec = vecs[i];
+
+        ctx.lineTo(vec.x, vec.y);
+
+    }
+
+    ctx.closePath();
+
+    ctx.fill();
 
 }

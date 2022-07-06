@@ -3,6 +3,7 @@ export class AnimationManager {
     constructor(sprite) {
 
         this.sprite = sprite;
+        this.sprite.Modules.AnimationManager = this;
 
         this.originalRender = sprite.render;
 
